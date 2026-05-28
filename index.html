@@ -1464,5 +1464,42 @@ function csvToMarkdown(csv) {
 
 async function fetchSheet(gid) {
   const SID = '19Uc_jjR0trSLlsxQuqVxt9Z2Y6svE-0m34Hq_Pk5cig';
-  const url = `https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=${gid}`;
-  const r = await fetch(url, { credentials: 'omit
+  const url = `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`시트 로딩 실패 (gid=${gid}, status=${r.status})`);
+  return csvToMarkdown(await r.text());
+}
+
+// ══════════════════════════════════════════════
+// 데이터 로드
+// ══════════════════════════════════════════════
+async function loadData() {
+  document.getElementById('bat-list').innerHTML = '<div class="loading"><div class="spin"></div><div class="ltxt">구글시트 읽는 중...</div></div>';
+  document.getElementById('kpi-grid').innerHTML = '';
+  document.getElementById('upd').textContent = '로딩 중...';
+  try {
+    // 요약(714373386) + FY26 정왕(1716487207) + FY26 안양(45566559)
+    const [mdSummary, mdJW, mdAY] = await Promise.all([
+      fetchSheet(714373386),
+      fetchSheet(1716487207),
+      fetchSheet(45566559),
+    ]);
+    const content = [mdSummary, '', mdJW, '', mdAY].join('\n');
+    if (!content || content.length < 50) throw new Error('시트 내용이 비어있어요');
+    data = parseAll(content);
+    const d = data.all;
+    const now = new Date();
+    document.getElementById('upd').textContent =
+      `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} · 타자 ${d.batters.length}명 · 투수 ${d.pitchers.length}명`;
+    renderAll();
+  } catch(e) {
+    document.getElementById('bat-list').innerHTML =
+      `<div class="errbox">⚠️ ${e.message}<br><button class="rbtn" onclick="loadData()">다시 시도</button></div>`;
+    document.getElementById('upd').textContent = '로드 실패';
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>

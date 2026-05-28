@@ -1419,4 +1419,50 @@ function openM() {
 }
 function closeModal() {
   document.getElementById('ov').classList.remove('on');
-  document.getElementById(
+  document.getElementById('modal').classList.remove('on');
+}
+
+// ══════════════════════════════════════════════
+// CSV → Markdown 변환 (GitHub Pages용)
+// ══════════════════════════════════════════════
+function parseCSVLine(line) {
+  const cells = [];
+  let i = 0;
+  while (i <= line.length) {
+    if (i === line.length) { cells.push(''); break; }
+    if (line[i] === '"') {
+      let j = i + 1, cell = '';
+      while (j < line.length) {
+        if (line[j] === '"' && line[j+1] === '"') { cell += '"'; j += 2; }
+        else if (line[j] === '"') { j++; break; }
+        else { cell += line[j++]; }
+      }
+      cells.push(cell);
+      if (line[j] === ',') j++;
+      i = j;
+    } else {
+      let j = i;
+      while (j < line.length && line[j] !== ',') j++;
+      cells.push(line.slice(i, j));
+      i = j + 1;
+    }
+  }
+  return cells;
+}
+
+function csvToMarkdown(csv) {
+  const lines = csv.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const out = [];
+  for (const line of lines) {
+    const cells = parseCSVLine(line);
+    const allEmpty = cells.every(c => !c);
+    if (allEmpty) { out.push(''); continue; }
+    out.push('|' + cells.join('|') + '|');
+  }
+  return out.join('\n');
+}
+
+async function fetchSheet(gid) {
+  const SID = '19Uc_jjR0trSLlsxQuqVxt9Z2Y6svE-0m34Hq_Pk5cig';
+  const url = `https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=${gid}`;
+  const r = await fetch(url, { credentials: 'omit

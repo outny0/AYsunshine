@@ -2,125 +2,174 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>⚾ AY션샤인</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <style>
 :root{
-  --blue:#1a6fd4;--blue-lt:#eef4ff;
-  --green:#2e7d32;--green-lt:#e8f5e9;
-  --orange:#e65100;--orange-lt:#fff3e0;
-  --red:#c62828;--red-lt:#ffebee;
-  --bg:#f2f4f8;--card:#fff;--border:#e8e8e8;
+  --bg:#f0f2f5;--card:#fff;--border:#e4e8ef;
   --text:#1a1a1a;--sub:#666;--muted:#aaa;
+  --blue:#1a6fd4;--grn:#2ea043;--red:#cf222e;--amb:#9a6700;
+  --grn-bg:#dafbe1;--red-bg:#ffebe9;--blu-bg:#ddf4ff;--amb-bg:#fff8c5;
+  --hdr:#0d1117;--hdr2:#161b22;--hdr3:#21262d;
+  --ht:#e6edf3;--hm:#7d8590;--hb:#30363d;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;}
-.hdr{background:var(--card);padding:12px 16px 0;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;box-shadow:0 1px 6px rgba(0,0,0,.06);}
-.hrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
-.hrow h1{font-size:17px;font-weight:800;letter-spacing:-.3px;}
-.hrow .upd{font-size:11px;color:var(--muted);}
-.reload{font-size:20px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:inherit;padding:2px 4px;line-height:1;}
-.reload:active{color:var(--blue);}
-.ltabs{display:flex;margin-top:2px;}
-.ltab{flex:1;padding:9px 6px;text-align:center;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;font-family:inherit;transition:.12s;}
-.ltab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:700;}
-.sec{padding:14px 12px 0;}
-.seclabel{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
-.kpigrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.kpicard{background:var(--card);border-radius:14px;padding:13px 14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.kpitit{font-size:11px;color:var(--sub);margin-bottom:4px;}
-.kpival{font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1.1;}
-.kpisub{font-size:11px;color:var(--muted);margin-top:3px;}
-.kpicard.blue .kpival{color:var(--blue);}
-.kpicard.grn .kpival{color:var(--green);}
-.recent{background:var(--card);border-radius:14px;padding:11px 14px;margin-top:8px;box-shadow:0 1px 4px rgba(0,0,0,.05);display:flex;align-items:center;gap:8px;}
-.rlab{font-size:11px;color:var(--sub);flex-shrink:0;}
-.dots{display:flex;gap:5px;}
-.dot{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-.dot.w{background:var(--green-lt);color:var(--green);}
-.dot.l{background:var(--red-lt);color:var(--red);}
-.dot.d{background:#f5f5f5;color:#888;}
-.chartrow{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
-.chartcard{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.charttit{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:10px;}
-#line-wrap{height:155px;position:relative;}
-#radar-wrap{height:195px;position:relative;}
-.top3grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
-.top3card{background:var(--card);border-radius:14px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.t3tit{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
-.t3row{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
-.t3rank{font-size:12px;font-weight:700;color:var(--muted);min-width:16px;}
-.t3rank.g1{color:#f5a623;}.t3rank.g2{color:#9b9b9b;}.t3rank.g3{color:#c08a50;}
-.t3name{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.t3val{font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0;}
-.ftabs{background:var(--card);display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-top:14px;position:sticky;top:78px;z-index:15;}
-.ftab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;font-family:inherit;transition:.1s;}
-.ftab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:700;}
-.sortbar{padding:8px 10px;display:flex;gap:6px;overflow-x:auto;background:var(--bg);scrollbar-width:none;}
-.sortbar::-webkit-scrollbar{display:none;}
-.sbtn{padding:5px 13px;border-radius:99px;border:1px solid #dde3ee;background:var(--card);font-size:12px;cursor:pointer;white-space:nowrap;color:#555;font-family:inherit;transition:.1s;}
-.sbtn.on{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600;}
-.qbtn{padding:5px 11px;border-radius:99px;border:1px solid #dde3ee;background:var(--card);font-size:12px;cursor:pointer;white-space:nowrap;color:var(--sub);font-family:inherit;margin-left:auto;flex-shrink:0;}
-.qbtn.on{background:var(--green-lt);color:var(--green);border-color:#a5d6a7;}
-.plist{padding:6px 10px 100px;}
-.pcard{background:var(--card);border-radius:14px;padding:13px 14px;margin-bottom:7px;display:flex;align-items:center;gap:11px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:box-shadow .15s;}
-.pcard:active{box-shadow:0 2px 10px rgba(0,0,0,.1);}
-.prank{font-size:13px;font-weight:700;color:var(--muted);min-width:22px;text-align:center;flex-shrink:0;}
-.prank.g1{color:#f5a623;}.prank.g2{color:#9b9b9b;}.prank.g3{color:#c08a50;}
-.pmid{flex:1;min-width:0;}
-.pname{font-size:15px;font-weight:700;}
-.psub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pbar{height:3px;background:#edf1fb;border-radius:2px;margin-top:8px;overflow:hidden;}
-.pbfill{height:100%;border-radius:2px;background:var(--blue);transition:width .35s;}
-.pbfill.grn{background:var(--green);}
-.pright{text-align:right;flex-shrink:0;}
-.pval{font-size:22px;font-weight:800;color:var(--blue);letter-spacing:-.5px;line-height:1.1;}
-.pval.grn{color:var(--green);}
-.plbl{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600;letter-spacing:.04em;}
-.sched-list{padding:6px 10px 100px;}
-.schedbanner{background:var(--card);border-radius:14px;padding:13px 14px;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.sb-date{font-size:11px;color:var(--sub);margin-bottom:3px;}
-.sb-opp{font-size:15px;font-weight:700;}
-.sb-meta{font-size:11px;color:var(--muted);margin-top:2px;}
-.sb-res{font-size:15px;font-weight:800;}
-.sb-res.w{color:var(--green);}.sb-res.l{color:var(--red);}.sb-res.d{color:var(--sub);}
-.sb-score{font-size:18px;font-weight:800;margin-top:2px;}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:40px;}
+
+/* ── Header ──────────────────────── */
+.hdr{background:var(--hdr);position:sticky;top:0;z-index:30;}
+.hdr-main{padding:12px 14px 8px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-left h1{font-size:18px;font-weight:700;color:var(--ht);letter-spacing:-.3px;}
+.hdr-left .rec{font-size:12px;color:var(--hm);margin-top:1px;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.upd{font-size:10px;color:var(--hm);}
+.rbtn{font-size:18px;color:var(--hm);background:none;border:none;cursor:pointer;padding:2px;line-height:1;}
+.strip{display:flex;border-top:1px solid var(--hb);border-bottom:1px solid var(--hb);}
+.sv{flex:1;padding:7px 4px;text-align:center;border-right:1px solid var(--hb);}
+.sv:last-child{border-right:none;}
+.sv-v{font-size:14px;font-weight:600;color:var(--ht);}
+.sv-v.pos{color:#3fb950;}.sv-v.neg{color:#f85149;}
+.sv-l{font-size:9px;color:var(--hm);margin-top:1px;letter-spacing:.04em;}
+.ltabs{display:flex;}
+.ltab{flex:1;padding:8px 0;text-align:center;font-size:13px;font-weight:500;color:var(--hm);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;font-family:inherit;transition:.12s;}
+.ltab.on{color:var(--ht);border-bottom-color:var(--ht);font-weight:700;}
+
+/* ── Form dots ───────────────────── */
+.form-section{background:var(--hdr2);padding:8px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--hb);}
+.form-label{font-size:9px;color:var(--hm);text-transform:uppercase;letter-spacing:.06em;margin-right:2px;}
+.dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.dot.w{background:#0d4429;color:#3fb950;}.dot.l{background:#3d1111;color:#f85149;}.dot.d{background:#1c2128;color:var(--hm);}
+
+/* ── Section ─────────────────────── */
+.sec-wrap{margin:10px 10px 0;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding:0 2px;}
+.sec-title{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;}
+.sec-extra{font-size:11px;color:var(--muted);}
+
+/* ── Stat strip cards ────────────── */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 10px 0;}
+.kpi{background:var(--card);border-radius:12px;padding:11px 13px;border:1px solid var(--border);}
+.kpi-t{font-size:10px;color:var(--sub);margin-bottom:3px;}
+.kpi-v{font-size:20px;font-weight:700;color:var(--blue);letter-spacing:-.5px;line-height:1.1;}
+.kpi-s{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* ── Chart ───────────────────────── */
+.chart-card{background:var(--card);border-radius:12px;padding:12px;border:1px solid var(--border);margin:10px 10px 0;}
+.chart-title{font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.chart-legend{display:flex;gap:10px;font-size:10px;color:var(--muted);}
+.chart-legend span{display:flex;align-items:center;gap:3px;}
+.chart-legend span::before{content:'';display:inline-block;width:12px;height:2px;border-radius:1px;}
+.legend-scored::before{background:var(--blue);}
+.legend-allowed::before{background:var(--red);}
+#line-wrap{height:130px;position:relative;}
+
+/* ── Compact table ───────────────── */
+.tbl-card{background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border);margin:10px 10px 0;}
+.sort-chips{padding:7px 10px;display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:#fafbfc;}
+.sort-chips::-webkit-scrollbar{display:none;}
+.chip{padding:4px 11px;border-radius:99px;border:1px solid var(--border);background:var(--card);font-size:11px;cursor:pointer;white-space:nowrap;color:var(--sub);font-family:inherit;transition:.1s;}
+.chip.on{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600;}
+.qual-chip{padding:4px 10px;border-radius:99px;border:1px solid var(--border);background:var(--card);font-size:11px;cursor:pointer;white-space:nowrap;color:var(--muted);font-family:inherit;margin-left:auto;flex-shrink:0;}
+.qual-chip.on{background:var(--grn-bg);color:var(--grn);border-color:#a5d6a7;font-weight:600;}
+.tbl-hdr{display:grid;padding:6px 12px;background:#fafbfc;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);gap:4px;user-select:none;}
+.tbl-hdr span{cursor:pointer;}
+.tbl-hdr span:hover{color:var(--blue);}
+.tbl-row{display:grid;padding:8px 12px;border-bottom:1px solid var(--border);gap:4px;cursor:pointer;transition:background .1s;align-items:center;}
+.tbl-row:last-child{border-bottom:none;}
+.tbl-row:active{background:#f5f8ff;}
+.t-rank{font-size:11px;color:var(--muted);}
+.t-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.t-num{font-size:12px;color:var(--sub);text-align:right;}
+.t-avg{font-size:12px;font-weight:700;text-align:right;}
+.avg-hi{color:var(--grn);}.avg-md{color:var(--text);}.avg-lo{color:var(--red);}
+.t-era{font-size:12px;font-weight:700;text-align:right;}
+.era-hi{color:var(--grn);}.era-md{color:var(--text);}.era-lo{color:var(--red);}
+
+/* ── Game log ────────────────────── */
+.gamelog-card{background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border);margin:10px 10px 0;}
+.gl-section-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#fafbfc;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+.gl-section-hdr:hover{background:#f0f2f5;}
+.gl-sh-left{display:flex;align-items:center;gap:8px;}
+.gl-sh-title{font-size:12px;font-weight:700;color:var(--text);}
+.gl-sh-badge{font-size:10px;color:var(--muted);}
+.gl-sh-record{font-size:11px;font-weight:600;}
+.gl-arrow{font-size:13px;color:var(--muted);transition:transform .2s;}
+.gl-arrow.open{transform:rotate(180deg);}
+.gl-body{display:none;}
+.gl-body.open{display:block;}
+.gl-hdr-row{display:grid;grid-template-columns:32px 1fr 60px 28px;padding:5px 12px;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);gap:4px;}
+.gl-row{display:grid;grid-template-columns:32px 1fr 60px 28px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;gap:4px;align-items:center;}
+.gl-row:last-child{border-bottom:none;}
+.gl-date{font-size:11px;color:var(--muted);}
+.gl-opp{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gl-score{display:flex;align-items:center;gap:4px;}
+.badge-w{display:inline-block;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;background:var(--grn-bg);color:var(--grn);}
+.badge-l{display:inline-block;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;background:var(--red-bg);color:var(--red);}
+.badge-d{display:inline-block;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;background:#f3f4f6;color:var(--muted);}
+.gl-scr{font-size:11px;color:var(--sub);}
+.rd-pos{font-size:11px;font-weight:700;color:var(--grn);}
+.rd-neg{font-size:11px;font-weight:700;color:var(--red);}
+.rd-zero{font-size:11px;color:var(--muted);}
+
+/* ── Season table ────────────────── */
+.szn-hdr{display:grid;grid-template-columns:40px 1fr 34px 52px 24px 24px 24px;padding:5px 12px;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);gap:3px;}
+.szn-row{display:grid;grid-template-columns:40px 1fr 34px 52px 24px 24px 24px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;gap:3px;align-items:center;}
+.szn-row:last-child{border-bottom:none;}
+.szn-yr{font-weight:700;}
+.szn-lg{font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.szn-pct{font-weight:700;color:var(--blue);}
+
+/* ── Modal ───────────────────────── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;}
 .overlay.on{display:block;}
-.modal{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-radius:22px 22px 0 0;max-height:82vh;overflow-y:auto;z-index:51;display:none;}
+.modal{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-radius:20px 20px 0 0;max-height:85vh;overflow-y:auto;z-index:51;display:none;}
 .modal.on{display:block;}
-.minner{padding:0 18px 50px;}
-.drag{width:38px;height:4px;background:#e0e0e0;border-radius:2px;margin:13px auto 14px;}
-.mname{font-size:22px;font-weight:800;letter-spacing:-.3px;}
-.msub{font-size:12px;color:var(--muted);margin-top:3px;}
-.msec{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:16px 0 8px;}
-.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.sg2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-.si{background:#f5f7fc;border-radius:12px;padding:11px 6px;text-align:center;}
-.si.hi{background:var(--blue-lt);}.si.warn{background:var(--orange-lt);}.si.grn{background:var(--green-lt);}
-.siv{font-size:17px;font-weight:800;}
-.si.hi .siv{color:var(--blue);}.si.warn .siv{color:var(--orange);}.si.grn .siv{color:var(--green);}
-.sil{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600;}
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--muted);gap:14px;}
-.spin{width:30px;height:30px;border:3px solid #e8e8e8;border-top-color:var(--blue);border-radius:50%;animation:rot .75s linear infinite;}
+.minner{padding:0 16px 50px;}
+.drag{width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:12px auto 14px;}
+.m-name{font-size:22px;font-weight:700;}
+.m-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.m-sec{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 7px;}
+.sg3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.si{background:#f5f7fc;border-radius:10px;padding:10px 6px;text-align:center;}
+.si.hi{background:var(--grn-bg);}.si.warn{background:var(--amb-bg);}.si.blu{background:var(--blu-bg);}
+.si-v{font-size:16px;font-weight:700;}
+.si.hi .si-v{color:var(--grn);}.si.warn .si-v{color:var(--amb);}.si.blu .si-v{color:var(--blue);}
+.si-l{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;}
+.hist-tbl{border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+.hist-hdr{display:grid;grid-template-columns:40px 44px 32px 28px 28px;padding:5px 10px;background:#f5f7fc;font-size:9px;font-weight:700;color:var(--muted);gap:4px;}
+.hist-row{display:grid;grid-template-columns:40px 44px 32px 28px 28px;padding:7px 10px;border-top:1px solid var(--border);font-size:11px;gap:4px;align-items:center;}
+.hist-yr{font-weight:700;color:var(--blue);font-size:11px;}
+
+/* ── States ─────────────────────── */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;color:var(--muted);gap:12px;}
+.spin{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:rot .75s linear infinite;}
 @keyframes rot{to{transform:rotate(360deg);}}
 .ltxt{font-size:13px;}
-.errbox{margin:24px 14px;background:#fff5f5;border-radius:13px;padding:22px 18px;text-align:center;color:var(--red);font-size:13px;line-height:1.7;}
-.rbtn{margin-top:12px;padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;cursor:pointer;font-family:inherit;}
-.empty{background:var(--card);border-radius:14px;padding:18px 16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.8;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.seclbl2{font-size:10px;font-weight:800;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;padding:10px 4px 6px;}
+.errbox{margin:20px 10px;background:var(--red-bg);border-radius:12px;padding:18px;text-align:center;color:var(--red);font-size:13px;line-height:1.7;border:1px solid #ffcdd2;}
+.err-rbtn{margin-top:10px;padding:7px 18px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;}
+.empty-row{padding:16px;text-align:center;font-size:12px;color:var(--muted);}
 </style>
 </head>
 <body>
 
 <div class="hdr">
-  <div class="hrow">
-    <h1>⚾ AY션샤인</h1>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span class="upd" id="upd">로딩 중...</span>
-      <button class="reload" onclick="loadData()">↻</button>
+  <div class="hdr-main">
+    <div class="hdr-left">
+      <h1 id="hdr-title">⚾ AY션샤인</h1>
+      <div class="rec" id="hdr-rec">로딩 중...</div>
     </div>
+    <div class="hdr-right">
+      <span class="upd" id="upd"></span>
+      <button class="rbtn" onclick="loadData()">↻</button>
+    </div>
+  </div>
+  <div class="strip" id="strip">
+    <div class="sv"><div class="sv-v" id="sv-rsg">-</div><div class="sv-l">RS/G</div></div>
+    <div class="sv"><div class="sv-v" id="sv-rag">-</div><div class="sv-l">RA/G</div></div>
+    <div class="sv"><div class="sv-v" id="sv-rd">-</div><div class="sv-l">득실차</div></div>
+    <div class="sv"><div class="sv-v" id="sv-avg">-</div><div class="sv-l">팀타율</div></div>
+    <div class="sv"><div class="sv-v" id="sv-era">-</div><div class="sv-l">팀ERA</div></div>
   </div>
   <div class="ltabs">
     <button class="ltab on" onclick="switchLeague('all')">통합</button>
@@ -129,454 +178,443 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
   </div>
 </div>
 
-<div class="sec">
-  <div class="seclabel">팀 현황</div>
-  <div class="kpigrid" id="kpi-grid"></div>
-  <div id="recent-row"></div>
-</div>
-
-<div class="sec">
-  <div class="seclabel">득점 / 실점 흐름</div>
-  <div class="chartrow">
-    <div class="chartcard">
-      <div id="line-wrap"><canvas id="chart-line"></canvas></div>
-    </div>
-  </div>
-</div>
-
-<div class="sec">
-  <div class="seclabel">부문 리더</div>
-  <div class="top3grid" id="top3-grid"></div>
-</div>
-
-<div class="ftabs">
-  <button class="ftab on" id="ft-bat" onclick="switchFooter('bat')">🏏 타자</button>
-  <button class="ftab" id="ft-pit" onclick="switchFooter('pit')">⚡ 투수</button>
-  <button class="ftab" id="ft-sch" onclick="switchFooter('sch')">📅 경기</button>
-</div>
-
-<div id="sec-bat">
-  <div class="sortbar" id="bat-sb">
-    <button class="sbtn on" onclick="sortB('AVG',this)">타율</button>
-    <button class="sbtn" onclick="sortB('H',this)">안타</button>
-    <button class="sbtn" onclick="sortB('RBI',this)">타점</button>
-    <button class="sbtn" onclick="sortB('R',this)">득점</button>
-    <button class="sbtn" onclick="sortB('SB',this)">도루</button>
-    <button class="sbtn" onclick="sortB('PA',this)">타석</button>
-    <button class="qbtn on" id="qbtn" onclick="toggleQual()">규정</button>
-  </div>
-  <div class="plist" id="bat-list"></div>
-</div>
-
-<div id="sec-pit" style="display:none">
-  <div class="sortbar" id="pit-sb">
-    <button class="sbtn on" onclick="sortP('ERA',this)">ERA</button>
-    <button class="sbtn" onclick="sortP('WHIP',this)">WHIP</button>
-    <button class="sbtn" onclick="sortP('K_BB',this)">K/BB</button>
-    <button class="sbtn" onclick="sortP('IP',this)">이닝</button>
-    <button class="sbtn" onclick="sortP('K',this)">탈삼진</button>
-  </div>
-  <div class="plist" id="pit-list"></div>
-</div>
-
-<div id="sec-sch" style="display:none">
-  <div class="sched-list" id="sch-list"></div>
+<div id="form-section" class="form-section" style="display:none"></div>
+<div id="main-content">
+  <div class="loading"><div class="spin"></div><div class="ltxt">데이터 로딩 중...</div></div>
 </div>
 
 <div class="overlay" id="ov" onclick="closeModal()"></div>
 <div class="modal" id="modal"><div class="minner" id="mbody"></div></div>
 
 <script>
-// ── State ──
-let curLeague='all', qualOnly=true, bKey='AVG', pKey='ERA';
-let sortedB=[], sortedP=[], chartLine=null;
-let data={all:{batters:[],pitchers:[],games:[]},jw:{batters:[],pitchers:[],games:[]},ay:{batters:[],pitchers:[],games:[]}};
+// ── State ──────────────────────────────────────
+let curLeague='all', bSort='AVG', pSort='ERA', qualOnly=true;
+let sortedB=[], sortedP=[];
+let chartLine=null;
+let data={all:{batters:[],pitchers:[],games:[],pastAy:[],jwSeasons:[]},
+          jw:{batters:[],pitchers:[],games:[],pastAy:[],jwSeasons:[]},
+          ay:{batters:[],pitchers:[],games:[],pastAy:[],jwSeasons:[]}};
 
-// ── Helpers ──
-const fi = v => { const f=parseFloat(v); return isNaN(f)?'-':String(Math.round(f)); };
-const fd = (v,d=3) => { const f=parseFloat(v); return isNaN(f)?'-':f.toFixed(d); };
+// ── Helpers ────────────────────────────────────
+const fi=v=>{const f=parseFloat(v);return isNaN(f)?'-':String(Math.round(f));};
+const fd=(v,d=3)=>{const f=parseFloat(v);return isNaN(f)?'-':f.toFixed(d);};
+function ipToDec(ip){const f=Math.floor(parseFloat(ip)||0);const r=Math.round(((parseFloat(ip)||0)-f)*10);return f+r/3;}
 
-function ipToDec(ip) {
-  const full=Math.floor(parseFloat(ip)||0);
-  const frac=Math.round(((parseFloat(ip)||0)-full)*10);
-  return full + frac/3;
+function txBatter(b){
+  return{name:b.name,PA:b.pa,AB:b.ab,H:b.h,RBI:b.rbi,R:b.r,SB:b.sb,AVG:b.avg};
 }
-
-// ── Transform JSON → render format ──
-function txBatter(b) {
-  return { name:b.name, PA:b.pa, AB:b.ab, H:b.h, RBI:b.rbi, R:b.r, SB:b.sb, AVG:b.avg };
+function txPitcher(p){
+  const ipDec=ipToDec(p.ip);
+  const whip=ipDec>0?Math.round((p.h+p.bb)/ipDec*100)/100:null;
+  const kbb=p.bb>0?Math.round(p.so/p.bb*100)/100:null;
+  return{name:p.name,G:p.g,IP:p.ip,ERA:p.era,WHIP:whip,K_BB:kbb,K:p.so,BB:p.bb,H:p.h,R:p.r,ER:p.er,W:p.w,L:p.l,SV:p.s};
 }
-function txPitcher(p) {
-  const ipDec = ipToDec(p.ip);
-  const whip = ipDec>0 ? Math.round((p.h+p.bb)/ipDec*100)/100 : null;
-  const kbb  = p.bb>0  ? Math.round(p.so/p.bb*100)/100 : null;
-  return { name:p.name, G:p.g, IP:p.ip, ERA:p.era, WHIP:whip, K_BB:kbb,
-           K:p.so, BB:p.bb, H:p.h, R:p.r, ER:p.er, W:p.w, L:p.l, SV:p.s };
-}
-function buildData(json) {
-  const games   = json.games    || [];
-  const pastAy  = json.past_ay_games || [];
-  const jwSzns  = json.jw_seasons    || [];
-  const batters  = (json.batters      || []).map(txBatter);
-  const pitchers = (json.pitchers     || []).map(txPitcher);
-  const jwBat    = (json.jw_batters   || []).map(txBatter);
-  const jwPit    = (json.jw_pitchers  || []).map(txPitcher);
-  const ayBat    = (json.ay_batters   || []).map(txBatter);
-  const ayPit    = (json.ay_pitchers  || []).map(txPitcher);
-  const pastBats = json.past_batters || [];
-  return {
-    all: { batters, pitchers, games, pastAy, jwSeasons:jwSzns, pastBats },
-    jw:  { batters:jwBat.length?jwBat:batters, pitchers:jwPit.length?jwPit:pitchers,
-           games:games.filter(g=>g.league==='정왕'), pastAy:[], jwSeasons:jwSzns, pastBats },
-    ay:  { batters:ayBat.length?ayBat:batters, pitchers:ayPit.length?ayPit:pitchers,
-           games:games.filter(g=>g.league==='안양'), pastAy, jwSeasons:[], pastBats },
+function buildData(json){
+  const games=json.games||[];
+  const pastAy=json.past_ay_games||[];
+  const jwSzns=json.jw_seasons||[];
+  const pastBats=json.past_batters||[];
+  const bat=(json.batters||[]).map(txBatter);
+  const pit=(json.pitchers||[]).map(txPitcher);
+  const jwB=(json.jw_batters||[]).map(txBatter);
+  const jwP=(json.jw_pitchers||[]).map(txPitcher);
+  const ayB=(json.ay_batters||[]).map(txBatter);
+  const ayP=(json.ay_pitchers||[]).map(txPitcher);
+  return{
+    all:{batters:bat,pitchers:pit,games,pastAy,jwSeasons:jwSzns,pastBats},
+    jw:{batters:jwB.length?jwB:bat,pitchers:jwP.length?jwP:pit,
+        games:games.filter(g=>g.league==='정왕'),pastAy:[],jwSeasons:jwSzns,pastBats},
+    ay:{batters:ayB.length?ayB:bat,pitchers:ayP.length?ayP:pit,
+        games:games.filter(g=>g.league==='안양'),pastAy,jwSeasons:[],pastBats},
   };
 }
 
-// ── KPI ──
-function renderOverview(batters, pitchers, games) {
+// ── Render ─────────────────────────────────────
+function renderAll(){
+  const d=data[curLeague];
+  renderHeader(d);
+  renderForm(d.games);
+  let html='';
+  html+=renderBatSection(d.batters);
+  html+=renderPitSection(d.pitchers);
+  html+=renderChartSection(d.games);
+  html+=renderGameSection(d.games,d.pastAy,d.jwSeasons);
+  document.getElementById('main-content').innerHTML=html;
+  initChart(d.games);
+  rebuildBatters(d.batters);
+  rebuildPitchers(d.pitchers);
+}
+
+function renderHeader(d){
+  const games=d.games||[];
   const gW=games.filter(g=>g.result==='승').length;
   const gL=games.filter(g=>g.result==='패').length;
   const gD=games.filter(g=>g.result==='무').length;
   const totG=gW+gL+gD;
-  const winPct = totG>0 ? (gW/totG).toFixed(3) : '-';
-  const totAB = batters.reduce((s,b)=>s+b.AB,0);
-  const totH  = batters.reduce((s,b)=>s+b.H,0);
-  const teamAVG = totAB>0 ? (totH/totAB).toFixed(3) : '-';
-  const vp = pitchers.filter(p=>p.IP>0);
-  const totIpDec = vp.reduce((s,p)=>s+ipToDec(p.IP),0);
-  const totER    = vp.reduce((s,p)=>s+(p.ER||0),0);
-  const teamERA  = totIpDec>0 ? (totER*7/totIpDec).toFixed(2) : '-';
-  const totSB = batters.reduce((s,b)=>s+(b.SB||0),0);
-  const totK  = pitchers.reduce((s,p)=>s+(p.K||0),0);
-
-  document.getElementById('kpi-grid').innerHTML=`
-    <div class="kpicard blue">
-      <div class="kpitit">팀 전적</div>
-      <div class="kpival">${totG>0?`${gW}승 ${gD}무 ${gL}패`:'기록 없음'}</div>
-      <div class="kpisub">승률 ${winPct}</div>
-    </div>
-    <div class="kpicard grn">
-      <div class="kpitit">팀 타율 / ERA</div>
-      <div class="kpival">${teamAVG}</div>
-      <div class="kpisub">ERA ${teamERA} (7이닝 기준)</div>
-    </div>
-    <div class="kpicard">
-      <div class="kpitit">팀 도루</div>
-      <div class="kpival">${totSB}</div>
-      <div class="kpisub">타자 ${batters.length}명</div>
-    </div>
-    <div class="kpicard">
-      <div class="kpitit">팀 탈삼진</div>
-      <div class="kpival">${totK}</div>
-      <div class="kpisub">투수 ${pitchers.length}명</div>
-    </div>`;
-
-  const recent = games.slice(-5).reverse();
-  const recEl = document.getElementById('recent-row');
-  if (recent.length>0) {
-    const dots = recent.map(g=>{
-      const cls=g.result==='승'?'w':g.result==='패'?'l':'d';
-      return `<div class="dot ${cls}" title="${g.opp} ${g.scored}-${g.allowed}">${cls==='w'?'승':cls==='l'?'패':'무'}</div>`;
-    }).join('');
-    recEl.innerHTML=`<div class="recent"><span class="rlab">최근</span><div class="dots">${dots}</div></div>`;
-  } else recEl.innerHTML='';
+  document.getElementById('hdr-rec').textContent=
+    totG>0?`${gW}W · ${gL}L${gD?' · '+gD+'D':''} · 승률 ${(gW/totG).toFixed(3)}`:'경기 없음';
+  // strip
+  const totRS=games.reduce((s,g)=>s+(g.scored??0),0);
+  const totRA=games.reduce((s,g)=>s+(g.allowed??0),0);
+  const rsg=totG>0?(totRS/totG).toFixed(1):'-';
+  const rag=totG>0?(totRA/totG).toFixed(1):'-';
+  const rd=totRS-totRA;
+  const bat=d.batters||[];
+  const pit=d.pitchers||[];
+  const totAB=bat.reduce((s,b)=>s+b.AB,0);
+  const totH=bat.reduce((s,b)=>s+b.H,0);
+  const teamAvg=totAB>0?(totH/totAB).toFixed(3):'-';
+  const totIpDec=pit.reduce((s,p)=>s+ipToDec(p.IP||0),0);
+  const totER=pit.reduce((s,p)=>s+(p.ER||0),0);
+  const teamERA=totIpDec>0?(totER*7/totIpDec).toFixed(2):'-';
+  document.getElementById('sv-rsg').textContent=rsg;
+  document.getElementById('sv-rsg').className='sv-v'+(totG>0&&parseFloat(rsg)>parseFloat(rag)?' pos':'');
+  document.getElementById('sv-rag').textContent=rag;
+  document.getElementById('sv-rag').className='sv-v'+(totG>0&&parseFloat(rag)>parseFloat(rsg)?' neg':'');
+  const rdEl=document.getElementById('sv-rd');
+  rdEl.textContent=rd>=0?'+'+rd:String(rd);
+  rdEl.className='sv-v'+(rd>0?' pos':rd<0?' neg':'');
+  document.getElementById('sv-avg').textContent=teamAvg;
+  document.getElementById('sv-era').textContent=teamERA;
 }
 
-// ── 득점/실점 차트 ──
-function renderCharts(games) {
-  if (chartLine) { chartLine.destroy(); chartLine=null; }
-  const wrap = document.getElementById('line-wrap');
-  if (games.length===0) {
-    wrap.innerHTML=`<div class="empty" style="margin:0"><strong>경기 기록 없음</strong></div>`; return;
-  }
-  wrap.innerHTML='<canvas id="chart-line" height="155"></canvas>';
-  chartLine = new Chart(document.getElementById('chart-line'),{
-    type:'line',
-    data:{
-      labels: games.map(g=>g.opp||g.date),
-      datasets:[
-        {label:'득점',data:games.map(g=>g.scored??0),borderColor:'#1a6fd4',backgroundColor:'rgba(26,111,212,.1)',tension:.3,fill:true,pointRadius:4},
-        {label:'실점',data:games.map(g=>g.allowed??0),borderColor:'#e53935',backgroundColor:'rgba(229,57,53,.07)',tension:.3,fill:true,pointRadius:4},
-      ]
-    },
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}}},
-      scales:{x:{ticks:{font:{size:10},maxRotation:30},grid:{display:false}},y:{ticks:{font:{size:10},stepSize:1},beginAtZero:true}}}
-  });
-}
-
-// ── 부문 리더 ──
-function renderTop3(batters, pitchers) {
-  const cats=[
-    {key:'AVG',  label:'타율',  fmt:v=>v.toFixed(3), pool:batters,  asc:false},
-    {key:'RBI',  label:'타점',  fmt:v=>Math.round(v),pool:batters,  asc:false},
-    {key:'H',    label:'안타',  fmt:v=>Math.round(v),pool:batters,  asc:false},
-    {key:'SB',   label:'도루',  fmt:v=>Math.round(v),pool:batters,  asc:false},
-    {key:'ERA',  label:'ERA',   fmt:v=>v.toFixed(2), pool:pitchers, asc:true},
-    {key:'K',    label:'탈삼진',fmt:v=>Math.round(v),pool:pitchers, asc:false},
-    {key:'IP',   label:'이닝',  fmt:v=>v,            pool:pitchers, asc:false},
-    {key:'WHIP', label:'WHIP',  fmt:v=>v.toFixed(2), pool:pitchers, asc:true},
-  ];
-  document.getElementById('top3-grid').innerHTML=cats.map(({key,label,fmt,pool,asc})=>{
-    const sorted=[...pool].filter(p=>p[key]!=null).sort((a,b)=>asc?a[key]-b[key]:b[key]-a[key]).slice(0,3);
-    const rows=sorted.map((p,i)=>{
-      const cls=i===0?'g1':i===1?'g2':'g3';
-      return `<div class="t3row"><div class="t3rank ${cls}">${i+1}</div><div class="t3name">${p.name}</div><div class="t3val">${fmt(p[key])}</div></div>`;
-    }).join('');
-    return `<div class="top3card"><div class="t3tit">${label}</div>${rows||'<div style="font-size:11px;color:#bbb;text-align:center;padding:8px 0">-</div>'}</div>`;
+function renderForm(games){
+  const el=document.getElementById('form-section');
+  if(!games.length){el.style.display='none';return;}
+  el.style.display='flex';
+  const recent=[...games].slice(-10).reverse();
+  const dots=recent.map(g=>{
+    const cls=g.result==='승'?'w':g.result==='패'?'l':'d';
+    const txt=cls==='w'?'승':cls==='l'?'패':'무';
+    return`<div class="dot ${cls}" title="${g.opp}">${txt}</div>`;
   }).join('');
+  el.innerHTML=`<span class="form-label">최근</span>${dots}`;
 }
 
-// ── 타자 리스트 ──
-function filteredBatters(batters) {
-  if (!qualOnly) return batters;
-  const maxPA = batters.reduce((m,b)=>Math.max(m,b.PA||0),0);
-  const thr = Math.max(3, Math.round(maxPA*.25));
-  return batters.filter(b=>(b.PA||0)>=thr);
-}
+// ── 타자 테이블 ────────────────────────────────
+const batCols=[
+  {key:'AVG',label:'타율',fmt:v=>fd(v),asc:false},
+  {key:'H',label:'안타',fmt:v=>fi(v),asc:false},
+  {key:'RBI',label:'타점',fmt:v=>fi(v),asc:false},
+  {key:'R',label:'득점',fmt:v=>fi(v),asc:false},
+  {key:'SB',label:'도루',fmt:v=>fi(v),asc:false},
+  {key:'PA',label:'타석',fmt:v=>fi(v),asc:false},
+];
 
-function renderBatList(batters) {
-  const pool=filteredBatters(batters);
-  const isInt=['H','RBI','R','SB','PA'].includes(bKey);
-  sortedB=[...pool].sort((a,b)=>(parseFloat(b[bKey])||0)-(parseFloat(a[bKey])||0));
-  const max=parseFloat(sortedB[0]?.[bKey])||1;
-  const lbls={AVG:'타율',H:'안타',RBI:'타점',R:'득점',SB:'도루',PA:'타석'};
-  document.getElementById('bat-list').innerHTML=sortedB.map((p,i)=>{
-    const raw=parseFloat(p[bKey])||0;
-    const disp=isInt?Math.round(raw):raw.toFixed(3);
-    const pct=Math.round(raw/max*100);
-    const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';
-    const sub=`${fi(p.PA)}타석 ${fi(p.AB)}타수 ${fi(p.H)}안타 · 타점${fi(p.RBI)} 득점${fi(p.R)} 도루${fi(p.SB)}`;
-    return `<div class="pcard" onclick="showB(${i})">
-      <div class="prank ${rc}">${i+1}</div>
-      <div class="pmid">
-        <div class="pname">${p.name}</div>
-        <div class="psub">${sub}</div>
-        <div class="pbar"><div class="pbfill" style="width:${pct}%"></div></div>
-      </div>
-      <div class="pright"><div class="pval">${disp}</div><div class="plbl">${lbls[bKey]}</div></div>
-    </div>`;
-  }).join('')||'<div class="empty" style="margin:10px"><strong>타자 데이터 없음</strong></div>';
-}
-
-// ── 투수 리스트 ──
-function renderPitList(pitchers) {
-  const lb=['ERA','WHIP'].includes(pKey);
-  sortedP=[...pitchers].sort((a,b)=>{
-    const av=parseFloat(a[pKey])??(lb?9999:-1);
-    const bv=parseFloat(b[pKey])??(lb?9999:-1);
-    return lb?av-bv:bv-av;
-  });
-  const vals=sortedP.map(p=>parseFloat(p[pKey])).filter(v=>!isNaN(v)&&v>0);
-  const maxV=Math.max(...vals,1), minV=Math.min(...vals,0);
-  const lbls={ERA:'ERA',WHIP:'WHIP',K_BB:'K/BB',IP:'이닝',K:'탈삼진'};
-  document.getElementById('pit-list').innerHTML=sortedP.map((p,i)=>{
-    const raw=parseFloat(p[pKey]);
-    const disp=isNaN(raw)?'-':pKey==='IP'?raw:raw.toFixed(2);
-    const pct=isNaN(raw)?5:lb?Math.max(5,Math.round((maxV-raw)/Math.max(maxV-minV,.01)*100)):Math.round(raw/maxV*100);
-    const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';
-    const good=lb&&i<3;
-    const wl=`${fi(p.W)}승 ${fi(p.L)}패${(p.SV||0)>0?' '+fi(p.SV)+'세':''}`;
-    const sub=`${fi(p.G)}등판 · ${p.IP}이닝 · ${fi(p.K)}K · ${wl}`;
-    return `<div class="pcard" onclick="showP(${i})">
-      <div class="prank ${rc}">${i+1}</div>
-      <div class="pmid">
-        <div class="pname">${p.name}</div>
-        <div class="psub">${sub}</div>
-        <div class="pbar"><div class="pbfill${good?' grn':''}" style="width:${pct}%"></div></div>
-      </div>
-      <div class="pright"><div class="pval${good?' grn':''}">${disp}</div><div class="plbl">${lbls[pKey]}</div></div>
-    </div>`;
-  }).join('')||'<div class="empty" style="margin:10px"><strong>투수 데이터 없음</strong></div>';
-}
-
-// ── 경기 기록 ──
-function gameCard(g) {
-  const cls=g.result==='승'?'w':g.result==='패'?'l':'d';
-  const score=(g.scored!==null&&g.allowed!==null)?`${g.scored} - ${g.allowed}`:g.result;
-  return `<div class="schedbanner" style="display:flex;align-items:center;gap:12px">
-    <div style="flex:1">
-      <div class="sb-date">${g.date}${g.year&&g.year!=='2026'?' · '+g.year:''}${g.league?' · '+g.league:''}</div>
-      <div class="sb-opp">vs ${g.opp}</div>
-    </div>
-    <div style="text-align:right">
-      <div class="sb-res ${cls}">${g.result}</div>
-      <div class="sb-score">${score}</div>
-    </div>
+function renderBatSection(batters){
+  const chips=batCols.map(c=>
+    `<button class="chip${bSort===c.key?' on':''}" onclick="setBSort('${c.key}')">${c.label}</button>`
+  ).join('');
+  return`<div class="sec-wrap"><div class="sec-hdr"><span class="sec-title">🏏 타자 기록</span></div></div>
+  <div class="tbl-card">
+    <div class="sort-chips">${chips}<button class="qual-chip${qualOnly?' on':''}" id="qbtn" onclick="toggleQual()">규정</button></div>
+    <div id="bat-tbl"></div>
   </div>`;
 }
 
-function renderGameLog(currentGames, pastAy, jwSeasons) {
-  let html='';
-
-  // FY26 현재 시즌
-  if (currentGames.length>0) {
-    html+='<div class="seclbl2">⚾ 2026 시즌</div>';
-    html+=[...currentGames].sort((a,b)=>b.date.localeCompare(a.date)).map(gameCard).join('');
-  }
-
-  // 정왕 시즌 요약
-  if (jwSeasons.length>0) {
-    html+='<div class="seclbl2">📊 정왕 역대 시즌</div>';
-    html+='<div style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.05)">';
-    html+='<div style="display:grid;grid-template-columns:48px 1fr 44px 60px 28px 28px 28px;padding:8px 14px;background:#f5f7fc;font-size:10px;font-weight:700;color:var(--sub)"><span>연도</span><span>리그</span><span>경기</span><span>승률</span><span style="color:var(--green)">승</span><span>무</span><span style="color:var(--red)">패</span></div>';
-    html+=[...jwSeasons].reverse().map(s=>{
-      const pct=s.g>0?(s.w/s.g).toFixed(3):'-';
-      return `<div style="display:grid;grid-template-columns:48px 1fr 44px 60px 28px 28px 28px;padding:10px 14px;border-top:1px solid var(--border);font-size:13px;align-items:center">
-        <span style="font-weight:700">${s.year}</span>
-        <span style="font-size:10px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.league_name}</span>
-        <span>${s.g}</span>
-        <span style="color:var(--blue);font-weight:700">${pct}</span>
-        <span style="color:var(--green);font-weight:700">${s.w}</span>
-        <span style="color:var(--sub)">${s.d}</span>
-        <span style="color:var(--red);font-weight:700">${s.l}</span>
+function avgClass(v){return v>=.350?'avg-hi':v<.250?'avg-lo':'avg-md';}
+const BAT_COLS='28px 1fr 42px 30px 28px 28px';
+function rebuildBatters(rawBatters){
+  const pool=qualOnly?filterQual(rawBatters):rawBatters;
+  const col=batCols.find(c=>c.key===bSort)||batCols[0];
+  sortedB=[...pool].sort((a,b)=>col.asc?(parseFloat(a[bSort])||0)-(parseFloat(b[bSort])||0):(parseFloat(b[bSort])||0)-(parseFloat(a[bSort])||0));
+  const hdrCols=batCols.map(c=>`<span style="${bSort===c.key?'color:var(--blue);':''}">${c.label}${bSort===c.key?(col.asc?'▲':'▼'):''}</span>`).join('');
+  let html=`<div class="tbl-hdr" style="grid-template-columns:${BAT_COLS};"><span>#</span><span>이름</span>${hdrCols}</div>`;
+  if(!sortedB.length){html+='<div class="empty-row">데이터 없음</div>';
+  } else {
+    html+=sortedB.map((p,i)=>{
+      const val=parseFloat(p[bSort])||0;
+      const disp=col.fmt(p[bSort]);
+      const ac=avgClass(p.AVG);
+      const rc=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+      return`<div class="tbl-row" style="grid-template-columns:${BAT_COLS};" onclick="showB(${i})">
+        <span class="t-rank">${rc}</span>
+        <span class="t-name">${p.name}</span>
+        <span class="t-avg ${bSort==='AVG'?ac:'t-num'}">${fd(p.AVG)}</span>
+        <span class="t-num">${fi(p.H)}</span>
+        <span class="t-num">${fi(p.RBI)}</span>
+        <span class="t-num">${fi(p.SB)}</span>
       </div>`;
     }).join('');
-    html+='</div>';
+  }
+  const el=document.getElementById('bat-tbl');
+  if(el) el.innerHTML=html;
+}
+function filterQual(batters){
+  const maxPA=batters.reduce((m,b)=>Math.max(m,b.PA||0),0);
+  const thr=Math.max(3,Math.round(maxPA*.25));
+  return batters.filter(b=>(b.PA||0)>=thr);
+}
+function setBSort(k){bSort=k;rebuildBatters(data[curLeague].batters);}
+function toggleQual(){
+  qualOnly=!qualOnly;
+  const btn=document.getElementById('qbtn');
+  if(btn){btn.classList.toggle('on',qualOnly);btn.textContent=qualOnly?'규정':'전체';}
+  rebuildBatters(data[curLeague].batters);
+}
+
+// ── 투수 테이블 ────────────────────────────────
+const pitCols=[
+  {key:'ERA',label:'ERA',fmt:v=>fd(v,2),asc:true},
+  {key:'WHIP',label:'WHIP',fmt:v=>fd(v,2),asc:true},
+  {key:'K_BB',label:'K/BB',fmt:v=>fd(v,2),asc:false},
+  {key:'IP',label:'이닝',fmt:v=>String(v),asc:false},
+  {key:'K',label:'K',fmt:v=>fi(v),asc:false},
+];
+
+function renderPitSection(pitchers){
+  const chips=pitCols.map(c=>
+    `<button class="chip${pSort===c.key?' on':''}" onclick="setPSort('${c.key}')">${c.label}</button>`
+  ).join('');
+  return`<div class="sec-wrap" style="margin-top:8px"><div class="sec-hdr"><span class="sec-title">⚡ 투수 기록</span></div></div>
+  <div class="tbl-card">
+    <div class="sort-chips">${chips}</div>
+    <div id="pit-tbl"></div>
+  </div>`;
+}
+
+function eraClass(v){return v<=5?'era-hi':v>=9?'era-lo':'era-md';}
+const PIT_COLS='28px 1fr 44px 38px 28px 28px';
+function rebuildPitchers(rawPit){
+  const col=pitCols.find(c=>c.key===pSort)||pitCols[0];
+  sortedP=[...rawPit].filter(p=>p.IP).sort((a,b)=>
+    col.asc?(parseFloat(a[pSort]??9999))-(parseFloat(b[pSort]??9999)):
+            (parseFloat(b[pSort]??-1))-(parseFloat(a[pSort]??-1))
+  );
+  const hdrCols=pitCols.map(c=>`<span style="${pSort===c.key?'color:var(--blue);':''}">${c.label}${pSort===c.key?(col.asc?'▲':'▼'):''}</span>`).join('');
+  let html=`<div class="tbl-hdr" style="grid-template-columns:${PIT_COLS};"><span>#</span><span>이름</span>${hdrCols}</div>`;
+  if(!sortedP.length){html+='<div class="empty-row">데이터 없음</div>';
+  } else {
+    html+=sortedP.map((p,i)=>{
+      const era=parseFloat(p.ERA)||0;
+      const ec=eraClass(era);
+      const wl=`${fi(p.W)}W ${fi(p.L)}L`;
+      const rc=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+      return`<div class="tbl-row" style="grid-template-columns:${PIT_COLS};" onclick="showP(${i})">
+        <span class="t-rank">${rc}</span>
+        <span class="t-name">${p.name}</span>
+        <span class="t-era ${pSort==='ERA'?ec:'t-num'}">${fd(p.ERA,2)}</span>
+        <span class="t-num" style="font-size:11px;">${wl}</span>
+        <span class="t-num">${fi(p.K)}</span>
+        <span class="t-num">${fi(p.BB)}</span>
+      </div>`;
+    }).join('');
+  }
+  const el=document.getElementById('pit-tbl');
+  if(el) el.innerHTML=html;
+}
+function setPSort(k){pSort=k;rebuildPitchers(data[curLeague].pitchers);}
+
+// ── 차트 ───────────────────────────────────────
+function renderChartSection(games){
+  if(!games.length) return '';
+  return`<div class="chart-card">
+    <div class="chart-title">
+      <span>득점 / 실점 흐름</span>
+      <div class="chart-legend"><span class="legend-scored">득점</span><span class="legend-allowed">실점</span></div>
+    </div>
+    <div id="line-wrap"><canvas id="chart-line"></canvas></div>
+  </div>`;
+}
+function initChart(games){
+  if(!games.length) return;
+  const ctx=document.getElementById('chart-line');
+  if(!ctx) return;
+  if(chartLine){chartLine.destroy();chartLine=null;}
+  chartLine=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:games.map(g=>g.opp||g.date),
+      datasets:[
+        {label:'득점',data:games.map(g=>g.scored??0),borderColor:'#1a6fd4',backgroundColor:'rgba(26,111,212,.1)',tension:.3,fill:true,pointRadius:3},
+        {label:'실점',data:games.map(g=>g.allowed??0),borderColor:'#cf222e',backgroundColor:'rgba(207,34,46,.07)',tension:.3,fill:true,pointRadius:3},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{font:{size:9},maxRotation:25},grid:{display:false}},
+              y:{ticks:{font:{size:9},stepSize:1},beginAtZero:true}}}
+  });
+}
+
+// ── 경기 기록 ──────────────────────────────────
+function gameRowHtml(g){
+  const cls=g.result==='승'?'w':g.result==='패'?'l':'d';
+  const rd=(g.scored!==null&&g.allowed!==null)?g.scored-g.allowed:null;
+  const rdHtml=rd===null?'<span class="rd-zero">-</span>':
+    rd>0?`<span class="rd-pos">+${rd}</span>`:
+    rd<0?`<span class="rd-neg">${rd}</span>`:`<span class="rd-zero">0</span>`;
+  const scoreStr=(g.scored!==null&&g.allowed!==null)?`${g.scored}-${g.allowed}`:'';
+  return`<div class="gl-row">
+    <span class="gl-date">${g.date||''}</span>
+    <span class="gl-opp">${g.opp||''}</span>
+    <div class="gl-score"><span class="badge-${cls}">${g.result}</span><span class="gl-scr">${scoreStr}</span></div>
+    ${rdHtml}
+  </div>`;
+}
+
+let accordionState={};
+function toggleAccordion(id){
+  accordionState[id]=!accordionState[id];
+  const body=document.getElementById('gl-body-'+id);
+  const arrow=document.getElementById('gl-arr-'+id);
+  if(body){body.className='gl-body'+(accordionState[id]?' open':'');}
+  if(arrow){arrow.className='gl-arrow'+(accordionState[id]?' open':'');}
+}
+
+function sectionHtml(id,title,badge,record,contentHtml,defaultOpen=false){
+  accordionState[id]=defaultOpen;
+  return`<div>
+    <div class="gl-section-hdr" onclick="toggleAccordion('${id}')">
+      <div class="gl-sh-left">
+        <span class="gl-sh-title">${title}</span>
+        ${badge?`<span class="gl-sh-badge">${badge}</span>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        ${record?`<span class="gl-sh-record" style="color:var(--blue)">${record}</span>`:''}
+        <span class="gl-arrow${defaultOpen?' open':''}" id="gl-arr-${id}">▾</span>
+      </div>
+    </div>
+    <div class="gl-body${defaultOpen?' open':''}" id="gl-body-${id}">${contentHtml}</div>
+  </div>`;
+}
+
+function renderGameSection(currentGames,pastAy,jwSeasons){
+  let html='<div class="sec-wrap" style="margin-top:8px"><div class="sec-hdr"><span class="sec-title">📅 경기 기록</span></div></div><div class="gamelog-card">';
+
+  // FY26 현재 시즌
+  if(currentGames.length>0){
+    const sorted=[...currentGames].sort((a,b)=>b.date.localeCompare(a.date));
+    const w=sorted.filter(g=>g.result==='승').length;
+    const l=sorted.filter(g=>g.result==='패').length;
+    const gHdr=`<div class="gl-hdr-row"><span>날짜</span><span>상대</span><span>결과</span><span>RD</span></div>`;
+    const content=gHdr+sorted.map(gameRowHtml).join('');
+    html+=sectionHtml('fy26','2026 시즌',`${sorted.length}경기`,`${w}승 ${l}패`,content,true);
   }
 
-  // 과거 안양 경기 (연도별)
-  if (pastAy.length>0) {
+  // 정왕 역대 시즌 요약
+  if(jwSeasons.length>0){
+    const sznHdr=`<div class="szn-hdr"><span>연도</span><span>리그</span><span>경기</span><span>승률</span><span>승</span><span>무</span><span>패</span></div>`;
+    const sznRows=[...jwSeasons].reverse().map(s=>{
+      const pct=s.g>0?(s.w/s.g).toFixed(3):'-';
+      return`<div class="szn-row">
+        <span class="szn-yr">${s.year}</span>
+        <span class="szn-lg">${s.league_name}</span>
+        <span>${s.g}</span>
+        <span class="szn-pct">${pct}</span>
+        <span style="color:var(--grn);font-weight:600;">${s.w}</span>
+        <span style="color:var(--muted);">${s.d}</span>
+        <span style="color:var(--red);font-weight:600;">${s.l}</span>
+      </div>`;
+    }).join('');
+    html+=sectionHtml('jw-seasons','정왕 역대 시즌',`${jwSeasons.length}시즌`,'',sznHdr+sznRows,false);
+  }
+
+  // 안양 과거 경기 (연도별 아코디언)
+  if(pastAy.length>0){
     const byYear={};
-    pastAy.forEach(g=>{ if(!byYear[g.year])byYear[g.year]=[]; byYear[g.year].push(g); });
+    pastAy.forEach(g=>{if(!byYear[g.year])byYear[g.year]=[];byYear[g.year].push(g);});
     Object.keys(byYear).sort((a,b)=>parseInt(b)-parseInt(a)).forEach(yr=>{
       const yg=[...byYear[yr]].sort((a,b)=>b.date.localeCompare(a.date));
       const w=yg.filter(g=>g.result==='승').length;
       const l=yg.filter(g=>g.result==='패').length;
       const d=yg.length-w-l;
-      html+=`<div class="seclbl2">🏟 안양 ${yr} · ${w}승 ${d>0?d+'무 ':''}${l}패</div>`;
-      html+=yg.map(gameCard).join('');
+      const gHdr=`<div class="gl-hdr-row"><span>날짜</span><span>상대</span><span>결과</span><span>RD</span></div>`;
+      const content=gHdr+yg.map(gameRowHtml).join('');
+      const rec=`${w}W ${d>0?d+'D ':''}${l}L`;
+      html+=sectionHtml(`ay-${yr}`,`안양 ${yr}`,`${yg.length}경기`,rec,content,false);
     });
   }
 
-  if(!html) html='<div class="empty" style="margin:10px"><strong>경기 기록 없음</strong></div>';
-  document.getElementById('sch-list').innerHTML=html;
+  html+='</div>';
+  return html;
 }
 
-function renderAll() {
+// ── 모달 ───────────────────────────────────────
+function showB(i){
+  const p=sortedB[i]; if(!p) return;
   const d=data[curLeague];
-  renderOverview(d.batters, d.pitchers, d.games);
-  renderCharts(d.games);
-  renderTop3(d.batters, d.pitchers);
-  renderBatList(d.batters);
-  renderPitList(d.pitchers);
-  renderGameLog(d.games, d.pastAy||[], d.jwSeasons||[]);
+  const hist=(d.pastBats||[]).filter(b=>b.name===p.name)
+    .sort((a,b_)=>b_.year.localeCompare(a.year));
+  const histSection=hist.length>0?`
+    <div class="m-sec">연도별 기록</div>
+    <div class="hist-tbl">
+      <div class="hist-hdr"><span>시즌</span><span>타율</span><span>타석</span><span>안타</span><span>타점</span></div>
+      <div class="hist-row"><span class="hist-yr">FY26</span><span class="avg-hi" style="font-size:11px;">${fd(p.AVG)}</span><span style="font-size:11px;">${fi(p.PA)}</span><span style="font-size:11px;">${fi(p.H)}</span><span style="font-size:11px;">${fi(p.RBI)}</span></div>
+      ${hist.map(b=>`<div class="hist-row"><span class="hist-yr">${b.year}</span><span class="${avgClass(b.avg)}" style="font-size:11px;">${fd(b.avg)}</span><span style="font-size:11px;">${b.pa}</span><span style="font-size:11px;">${b.h}</span><span style="font-size:11px;">${b.rbi}</span></div>`).join('')}
+    </div>`:
+    '<div style="font-size:11px;color:var(--muted);padding:4px 0;">FY25 이전 기록 없음</div>';
+
+  document.getElementById('mbody').innerHTML=`
+    <div class="drag"></div>
+    <div class="m-name">${p.name}</div>
+    <div class="m-sub">FY26 · ${fi(p.PA)}타석 · ${fi(p.AB)}타수 ${fi(p.H)}안타</div>
+    <div class="m-sec">FY26 기록</div>
+    <div class="sg3">
+      <div class="si hi"><div class="si-v">${fd(p.AVG)}</div><div class="si-l">AVG</div></div>
+      <div class="si"><div class="si-v">${fi(p.RBI)}</div><div class="si-l">RBI</div></div>
+      <div class="si"><div class="si-v">${fi(p.R)}</div><div class="si-l">득점</div></div>
+    </div>
+    <div class="sg3" style="margin-top:7px;">
+      <div class="si"><div class="si-v">${fi(p.H)}</div><div class="si-l">안타</div></div>
+      <div class="si"><div class="si-v">${fi(p.SB)}</div><div class="si-l">도루</div></div>
+      <div class="si"><div class="si-v">${fi(p.PA)}</div><div class="si-l">타석</div></div>
+    </div>
+    ${histSection}`;
+  openM();
 }
 
-// ── UI 핸들러 ──
-function switchLeague(l) {
+function showP(i){
+  const p=sortedP[i]; if(!p) return;
+  const wl=`${fi(p.W)}승 ${fi(p.L)}패${(p.SV||0)>0?' '+fi(p.SV)+'세':''}`;
+  document.getElementById('mbody').innerHTML=`
+    <div class="drag"></div>
+    <div class="m-name">${p.name}</div>
+    <div class="m-sub">${fi(p.G)}등판 · ${p.IP}이닝 · ${wl}</div>
+    <div class="m-sec">핵심 지표</div>
+    <div class="sg3">
+      <div class="si warn"><div class="si-v">${fd(p.ERA,2)}</div><div class="si-l">ERA</div></div>
+      <div class="si blu"><div class="si-v">${fd(p.WHIP,2)}</div><div class="si-l">WHIP</div></div>
+      <div class="si"><div class="si-v">${p.K_BB!=null?fd(p.K_BB,2):'-'}</div><div class="si-l">K/BB</div></div>
+    </div>
+    <div class="m-sec">투구 기록</div>
+    <div class="sg3">
+      <div class="si"><div class="si-v">${fi(p.K)}</div><div class="si-l">탈삼진</div></div>
+      <div class="si"><div class="si-v">${fi(p.BB)}</div><div class="si-l">볼넷</div></div>
+      <div class="si"><div class="si-v">${fi(p.H)}</div><div class="si-l">피안타</div></div>
+      <div class="si"><div class="si-v">${fi(p.R)}</div><div class="si-l">실점</div></div>
+      <div class="si hi"><div class="si-v">${fi(p.ER)}</div><div class="si-l">자책</div></div>
+      <div class="si"><div class="si-v">${p.IP}</div><div class="si-l">이닝</div></div>
+    </div>`;
+  openM();
+}
+
+function openM(){document.getElementById('ov').classList.add('on');document.getElementById('modal').classList.add('on');}
+function closeModal(){document.getElementById('ov').classList.remove('on');document.getElementById('modal').classList.remove('on');}
+
+// ── 리그 스위치 ────────────────────────────────
+function switchLeague(l){
   curLeague=l;
   document.querySelectorAll('.ltab').forEach((b,i)=>b.classList.toggle('on',['all','jw','ay'][i]===l));
   renderAll();
 }
-function switchFooter(t) {
-  ['bat','pit','sch'].forEach(id=>{
-    document.getElementById(`ft-${id}`).classList.toggle('on',id===t);
-    document.getElementById(`sec-${id}`).style.display=id===t?'':'none';
-  });
-}
-function sortB(key,btn) {
-  bKey=key;
-  document.querySelectorAll('#bat-sb .sbtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  renderBatList(data[curLeague].batters);
-}
-function sortP(key,btn) {
-  pKey=key;
-  document.querySelectorAll('#pit-sb .sbtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  renderPitList(data[curLeague].pitchers);
-}
-function toggleQual() {
-  qualOnly=!qualOnly;
-  const btn=document.getElementById('qbtn');
-  btn.classList.toggle('on',qualOnly);
-  btn.textContent=qualOnly?'규정':'전체';
-  renderBatList(data[curLeague].batters);
-}
 
-// ── 모달 ──
-function showB(i) {
-  const p=sortedB[i]; if (!p) return;
-  const d=data[curLeague];
-  const hist=(d.pastBats||[]).filter(b=>b.name===p.name)
-    .sort((a,b_)=>b_.year.localeCompare(a.year));
-  const histHtml = hist.length>0 ? `
-    <div class="msec">연도별 기록</div>
-    <div style="background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border)">
-      <div style="display:grid;grid-template-columns:60px 52px 52px 52px 40px 40px;padding:7px 12px;background:#f5f7fc;font-size:10px;font-weight:700;color:var(--sub)">
-        <span>시즌</span><span>타율</span><span>타석</span><span>안타</span><span>타점</span><span>도루</span>
-      </div>
-      ${hist.map(b=>`<div style="display:grid;grid-template-columns:60px 52px 52px 52px 40px 40px;padding:8px 12px;border-top:1px solid var(--border);font-size:13px;align-items:center">
-        <span style="font-weight:700;color:var(--blue)">${b.year}</span>
-        <span style="font-weight:600">${fd(b.avg)}</span>
-        <span>${b.pa}</span><span>${b.h}</span><span>${b.rbi}</span><span>${b.sb}</span>
-      </div>`).join('')}
-    </div>` : '';
-  document.getElementById('mbody').innerHTML=`
-    <div class="drag"></div>
-    <div class="mname">${p.name}</div>
-    <div class="msub">FY26 · ${fi(p.PA)}타석 · ${fi(p.AB)}타수 ${fi(p.H)}안타</div>
-    <div class="msec">FY26 타격 기록</div>
-    <div class="sg">
-      <div class="si hi"><div class="siv">${fd(p.AVG)}</div><div class="sil">타율</div></div>
-      <div class="si hi"><div class="siv">${fi(p.RBI)}</div><div class="sil">타점</div></div>
-      <div class="si hi"><div class="siv">${fi(p.R)}</div><div class="sil">득점</div></div>
-    </div>
-    <div class="sg" style="margin-top:8px">
-      <div class="si"><div class="siv">${fi(p.H)}</div><div class="sil">안타</div></div>
-      <div class="si"><div class="siv">${fi(p.SB)}</div><div class="sil">도루</div></div>
-      <div class="si"><div class="siv">${fi(p.PA)}</div><div class="sil">타석</div></div>
-    </div>
-    ${histHtml}`;
-  openM();
-}
-function showP(i) {
-  const p=sortedP[i]; if (!p) return;
-  const wl=`${fi(p.W)}승 ${fi(p.L)}패${(p.SV||0)>0?' '+fi(p.SV)+'세':''}`;
-  document.getElementById('mbody').innerHTML=`
-    <div class="drag"></div>
-    <div class="mname">${p.name}</div>
-    <div class="msub">${fi(p.G)}등판 · ${p.IP}이닝 · ${wl}</div>
-    <div class="msec">핵심 지표</div>
-    <div class="sg">
-      <div class="si warn"><div class="siv">${fd(p.ERA,2)}</div><div class="sil">ERA</div></div>
-      <div class="si hi"><div class="siv">${fd(p.WHIP,2)}</div><div class="sil">WHIP</div></div>
-      <div class="si hi"><div class="siv">${p.K_BB!=null?fd(p.K_BB,2):'-'}</div><div class="sil">K/BB</div></div>
-    </div>
-    <div class="msec">투구 기록</div>
-    <div class="sg">
-      <div class="si"><div class="siv">${fi(p.K)}</div><div class="sil">탈삼진</div></div>
-      <div class="si"><div class="siv">${fi(p.BB)}</div><div class="sil">볼넷</div></div>
-      <div class="si"><div class="siv">${fi(p.H)}</div><div class="sil">피안타</div></div>
-      <div class="si"><div class="siv">${fi(p.R)}</div><div class="sil">실점</div></div>
-      <div class="si grn"><div class="siv">${fi(p.ER)}</div><div class="sil">자책점</div></div>
-      <div class="si"><div class="siv">${p.IP}</div><div class="sil">이닝</div></div>
-    </div>`;
-  openM();
-}
-function openM(){document.getElementById('ov').classList.add('on');document.getElementById('modal').classList.add('on');}
-function closeModal(){document.getElementById('ov').classList.remove('on');document.getElementById('modal').classList.remove('on');}
-
-// ── 데이터 로드 ──
-async function loadData() {
-  document.getElementById('bat-list').innerHTML='<div class="loading"><div class="spin"></div><div class="ltxt">데이터 로딩 중...</div></div>';
-  document.getElementById('kpi-grid').innerHTML='';
-  document.getElementById('upd').textContent='로딩 중...';
-  try {
-    const r = await fetch('data.json');
-    if (!r.ok) throw new Error(`data.json 로딩 실패 (${r.status})`);
-    const json = await r.json();
-    data = buildData(json);
-    const d = data.all;
+// ── 데이터 로드 ────────────────────────────────
+async function loadData(){
+  document.getElementById('main-content').innerHTML=
+    '<div class="loading"><div class="spin"></div><div class="ltxt">데이터 로딩 중...</div></div>';
+  try{
+    const r=await fetch('data.json');
+    if(!r.ok) throw new Error(`data.json 로드 실패 (${r.status})`);
+    const json=await r.json();
+    data=buildData(json);
+    const d=data.all;
     document.getElementById('upd').textContent=
-      `${(json.updated||'').slice(5,16)} · 타자 ${d.batters.length}명 · 투수 ${d.pitchers.length}명`;
+      (json.updated||'').slice(5,16);
     renderAll();
-  } catch(e) {
-    document.getElementById('bat-list').innerHTML=
-      `<div class="errbox">⚠️ ${e.message}<br><button class="rbtn" onclick="loadData()">다시 시도</button></div>`;
-    document.getElementById('upd').textContent='로드 실패';
+  }catch(e){
+    document.getElementById('main-content').innerHTML=
+      `<div class="errbox">⚠️ ${e.message}<br><button class="err-rbtn" onclick="loadData()">다시 시도</button></div>`;
   }
 }
 loadData();

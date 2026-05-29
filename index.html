@@ -303,11 +303,11 @@ const batCols=[
 
 function renderBatSection(batters){
   const chips=batCols.map(c=>
-    `<button class="chip${bSort===c.key?' on':''}" onclick="setBSort('${c.key}')">${c.label}</button>`
+    `<button class="chip${bSort===c.key?' on':''}" data-key="${c.key}" onclick="setBSort('${c.key}')">${c.label}</button>`
   ).join('');
   return`<div class="sec-wrap"><div class="sec-hdr"><span class="sec-title">🏏 타자 기록</span></div></div>
   <div class="tbl-card">
-    <div class="sort-chips">${chips}<button class="qual-chip${qualOnly?' on':''}" id="qbtn" onclick="toggleQual()">규정</button></div>
+    <div class="sort-chips" id="bat-sb">${chips}<button class="qual-chip${qualOnly?' on':''}" id="qbtn" onclick="toggleQual()">규정</button></div>
     <div id="bat-tbl"></div>
   </div>`;
 }
@@ -339,6 +339,9 @@ function rebuildBatters(rawBatters){
   }
   const el=document.getElementById('bat-tbl');
   if(el) el.innerHTML=html;
+  document.querySelectorAll('#bat-sb .chip').forEach(b=>b.classList.toggle('on',b.dataset.key===bSort));
+  const qb=document.getElementById('qbtn');
+  if(qb){qb.classList.toggle('on',qualOnly);qb.textContent=qualOnly?'규정':'전체';}
 }
 function filterQual(batters){
   const maxPA=batters.reduce((m,b)=>Math.max(m,b.PA||0),0);
@@ -364,11 +367,11 @@ const pitCols=[
 
 function renderPitSection(pitchers){
   const chips=pitCols.map(c=>
-    `<button class="chip${pSort===c.key?' on':''}" onclick="setPSort('${c.key}')">${c.label}</button>`
+    `<button class="chip${pSort===c.key?' on':''}" data-key="${c.key}" onclick="setPSort('${c.key}')">${c.label}</button>`
   ).join('');
   return`<div class="sec-wrap" style="margin-top:8px"><div class="sec-hdr"><span class="sec-title">⚡ 투수 기록</span></div></div>
   <div class="tbl-card">
-    <div class="sort-chips">${chips}</div>
+    <div class="sort-chips" id="pit-sb">${chips}</div>
     <div id="pit-tbl"></div>
   </div>`;
 }
@@ -402,6 +405,7 @@ function rebuildPitchers(rawPit){
   }
   const el=document.getElementById('pit-tbl');
   if(el) el.innerHTML=html;
+  document.querySelectorAll('#pit-sb .chip').forEach(b=>b.classList.toggle('on',b.dataset.key===pSort));
 }
 function setPSort(k){pSort=k;rebuildPitchers(data[curLeague].pitchers);}
 

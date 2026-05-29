@@ -16,8 +16,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;}
-
-/* ── Header ── */
 .hdr{background:var(--card);padding:12px 16px 0;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;box-shadow:0 1px 6px rgba(0,0,0,.06);}
 .hrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
 .hrow h1{font-size:17px;font-weight:800;letter-spacing:-.3px;}
@@ -27,12 +25,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 .ltabs{display:flex;margin-top:2px;}
 .ltab{flex:1;padding:9px 6px;text-align:center;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;font-family:inherit;transition:.12s;}
 .ltab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:700;}
-
-/* ── Sections ── */
 .sec{padding:14px 12px 0;}
 .seclabel{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
-
-/* ── KPI grid ── */
 .kpigrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .kpicard{background:var(--card);border-radius:14px;padding:13px 14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .kpitit{font-size:11px;color:var(--sub);margin-bottom:4px;}
@@ -40,8 +34,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 .kpisub{font-size:11px;color:var(--muted);margin-top:3px;}
 .kpicard.blue .kpival{color:var(--blue);}
 .kpicard.grn .kpival{color:var(--green);}
-
-/* ── Recent results ── */
 .recent{background:var(--card);border-radius:14px;padding:11px 14px;margin-top:8px;box-shadow:0 1px 4px rgba(0,0,0,.05);display:flex;align-items:center;gap:8px;}
 .rlab{font-size:11px;color:var(--sub);flex-shrink:0;}
 .dots{display:flex;gap:5px;}
@@ -49,21 +41,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 .dot.w{background:var(--green-lt);color:var(--green);}
 .dot.l{background:var(--red-lt);color:var(--red);}
 .dot.d{background:#f5f5f5;color:#888;}
-
-/* ── Next game ── */
-.nextgame{background:linear-gradient(135deg,#1a6fd4,#1254a8);border-radius:14px;padding:13px 16px;margin-top:8px;color:#fff;box-shadow:0 2px 8px rgba(26,111,212,.22);}
-.ng-label{font-size:11px;opacity:.7;margin-bottom:5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
-.ng-opp{font-size:20px;font-weight:800;}
-.ng-meta{font-size:12px;opacity:.75;margin-top:4px;line-height:1.6;}
-
-/* ── Charts ── */
 .chartrow{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
 .chartcard{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .charttit{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:10px;}
 #line-wrap{height:155px;position:relative;}
 #radar-wrap{height:195px;position:relative;}
-
-/* ── Top 3 ── */
 .top3grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
 .top3card{background:var(--card);border-radius:14px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .t3tit{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
@@ -72,21 +54,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 .t3rank.g1{color:#f5a623;}.t3rank.g2{color:#9b9b9b;}.t3rank.g3{color:#c08a50;}
 .t3name{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .t3val{font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0;}
-
-/* ── Footer tabs ── */
 .ftabs{background:var(--card);display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-top:14px;position:sticky;top:78px;z-index:15;}
 .ftab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;font-family:inherit;transition:.1s;}
 .ftab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:700;}
-
-/* ── Sort bar ── */
 .sortbar{padding:8px 10px;display:flex;gap:6px;overflow-x:auto;background:var(--bg);scrollbar-width:none;}
 .sortbar::-webkit-scrollbar{display:none;}
 .sbtn{padding:5px 13px;border-radius:99px;border:1px solid #dde3ee;background:var(--card);font-size:12px;cursor:pointer;white-space:nowrap;color:#555;font-family:inherit;transition:.1s;}
 .sbtn.on{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600;}
 .qbtn{padding:5px 11px;border-radius:99px;border:1px solid #dde3ee;background:var(--card);font-size:12px;cursor:pointer;white-space:nowrap;color:var(--sub);font-family:inherit;margin-left:auto;flex-shrink:0;}
 .qbtn.on{background:var(--green-lt);color:var(--green);border-color:#a5d6a7;}
-
-/* ── Player list ── */
 .plist{padding:6px 10px 100px;}
 .pcard{background:var(--card);border-radius:14px;padding:13px 14px;margin-bottom:7px;display:flex;align-items:center;gap:11px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:box-shadow .15s;}
 .pcard:active{box-shadow:0 2px 10px rgba(0,0,0,.1);}
@@ -102,8 +78,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 .pval{font-size:22px;font-weight:800;color:var(--blue);letter-spacing:-.5px;line-height:1.1;}
 .pval.grn{color:var(--green);}
 .plbl{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600;letter-spacing:.04em;}
-
-/* ── Schedule ── */
 .sched-list{padding:6px 10px 100px;}
 .schedbanner{background:var(--card);border-radius:14px;padding:13px 14px;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .sb-date{font-size:11px;color:var(--sub);margin-bottom:3px;}
@@ -112,8 +86,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 .sb-res{font-size:15px;font-weight:800;}
 .sb-res.w{color:var(--green);}.sb-res.l{color:var(--red);}.sb-res.d{color:var(--sub);}
 .sb-score{font-size:18px;font-weight:800;margin-top:2px;}
-
-/* ── Modal ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50;}
 .overlay.on{display:block;}
 .modal{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-radius:22px 22px 0 0;max-height:82vh;overflow-y:auto;z-index:51;display:none;}
@@ -124,14 +96,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 .msub{font-size:12px;color:var(--muted);margin-top:3px;}
 .msec{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:16px 0 8px;}
 .sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.sg4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.sg2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
 .si{background:#f5f7fc;border-radius:12px;padding:11px 6px;text-align:center;}
 .si.hi{background:var(--blue-lt);}.si.warn{background:var(--orange-lt);}.si.grn{background:var(--green-lt);}
 .siv{font-size:17px;font-weight:800;}
 .si.hi .siv{color:var(--blue);}.si.warn .siv{color:var(--orange);}.si.grn .siv{color:var(--green);}
 .sil{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600;}
-
-/* ── States ── */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--muted);gap:14px;}
 .spin{width:30px;height:30px;border:3px solid #e8e8e8;border-top-color:var(--blue);border-radius:50%;animation:rot .75s linear infinite;}
 @keyframes rot{to{transform:rotate(360deg);}}
@@ -139,7 +109,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 .errbox{margin:24px 14px;background:#fff5f5;border-radius:13px;padding:22px 18px;text-align:center;color:var(--red);font-size:13px;line-height:1.7;}
 .rbtn{margin-top:12px;padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;cursor:pointer;font-family:inherit;}
 .empty{background:var(--card);border-radius:14px;padding:18px 16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.8;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.empty strong{display:block;font-size:13px;color:var(--sub);margin-bottom:5px;}
 .seclbl2{font-size:10px;font-weight:800;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;padding:10px 4px 6px;}
 </style>
 </head>
@@ -164,19 +133,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
   <div class="seclabel">팀 현황</div>
   <div class="kpigrid" id="kpi-grid"></div>
   <div id="recent-row"></div>
-  <div id="next-game"></div>
 </div>
 
 <div class="sec">
-  <div class="seclabel">팀 분석</div>
+  <div class="seclabel">득점 / 실점 흐름</div>
   <div class="chartrow">
     <div class="chartcard">
-      <div class="charttit">득점 / 실점 흐름</div>
       <div id="line-wrap"><canvas id="chart-line"></canvas></div>
-    </div>
-    <div class="chartcard">
-      <div class="charttit">팀 밸런스</div>
-      <div id="radar-wrap"><canvas id="chart-radar"></canvas></div>
     </div>
   </div>
 </div>
@@ -189,18 +152,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 <div class="ftabs">
   <button class="ftab on" id="ft-bat" onclick="switchFooter('bat')">🏏 타자</button>
   <button class="ftab" id="ft-pit" onclick="switchFooter('pit')">⚡ 투수</button>
-  <button class="ftab" id="ft-sch" onclick="switchFooter('sch')">📅 일정</button>
+  <button class="ftab" id="ft-sch" onclick="switchFooter('sch')">📅 경기</button>
 </div>
 
 <div id="sec-bat">
   <div class="sortbar" id="bat-sb">
-    <button class="sbtn on" onclick="sortB('OPS',this)">OPS</button>
-    <button class="sbtn" onclick="sortB('AVG',this)">타율</button>
-    <button class="sbtn" onclick="sortB('OBP',this)">출루율</button>
-    <button class="sbtn" onclick="sortB('SLG',this)">장타율</button>
-    <button class="sbtn" onclick="sortB('HR',this)">홈런</button>
+    <button class="sbtn on" onclick="sortB('AVG',this)">타율</button>
+    <button class="sbtn" onclick="sortB('H',this)">안타</button>
     <button class="sbtn" onclick="sortB('RBI',this)">타점</button>
+    <button class="sbtn" onclick="sortB('R',this)">득점</button>
     <button class="sbtn" onclick="sortB('SB',this)">도루</button>
+    <button class="sbtn" onclick="sortB('PA',this)">타석</button>
     <button class="qbtn on" id="qbtn" onclick="toggleQual()">규정</button>
   </div>
   <div class="plist" id="bat-list"></div>
@@ -225,1007 +187,160 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun 
 <div class="modal" id="modal"><div class="minner" id="mbody"></div></div>
 
 <script>
-// ══════════════════════════════════════════════
-// State
-// ══════════════════════════════════════════════
-let curLeague = 'all';
-let qualOnly = true;
-let bKey = 'OPS', pKey = 'ERA';
-let sortedB = [], sortedP = [];
-let chartLine = null, chartRadar = null;
-let data = {
-  all:{ batters:[], pitchers:[], games:[], schedule:[] },
-  jw: { batters:[], pitchers:[], games:[], schedule:[] },
-  ay: { batters:[], pitchers:[], games:[], schedule:[] },
-};
+// ── State ──
+let curLeague='all', qualOnly=true, bKey='AVG', pKey='ERA';
+let sortedB=[], sortedP=[], chartLine=null;
+let data={all:{batters:[],pitchers:[],games:[]},jw:{batters:[],pitchers:[],games:[]},ay:{batters:[],pitchers:[],games:[]}};
 
-// ══════════════════════════════════════════════
-// Utilities
-// ══════════════════════════════════════════════
-function extractContent(raw) {
-  if (typeof raw === 'string') return raw;
-  if (raw?.content && Array.isArray(raw.content) && raw.content[0]?.text) {
-    const t = raw.content[0].text;
-    try { const p = JSON.parse(t); return p.fileContent || p.content || p.text || t; } catch { return t; }
-  }
-  if (raw?.fileContent) return raw.fileContent;
-  if (raw?.content && typeof raw.content === 'string') return raw.content;
-  if (raw?.text) return raw.text;
-  return JSON.stringify(raw);
+// ── Helpers ──
+const fi = v => { const f=parseFloat(v); return isNaN(f)?'-':String(Math.round(f)); };
+const fd = (v,d=3) => { const f=parseFloat(v); return isNaN(f)?'-':f.toFixed(d); };
+
+function ipToDec(ip) {
+  const full=Math.floor(parseFloat(ip)||0);
+  const frac=Math.round(((parseFloat(ip)||0)-full)*10);
+  return full + frac/3;
 }
 
-// 컬럼 인덱스 탐색 (정확매치 → 부분매치)
-function ci(headers, ...kws) {
-  for (const kw of kws) { const i = headers.findIndex(h => h === kw); if (i >= 0) return i; }
-  for (const kw of kws) { const i = headers.findIndex(h => h.includes(kw)); if (i >= 0) return i; }
-  return -1;
+// ── Transform JSON → render format ──
+function txBatter(b) {
+  return { name:b.name, PA:b.pa, AB:b.ab, H:b.h, RBI:b.rbi, R:b.r, SB:b.sb, AVG:b.avg };
 }
-
-function num(cells, idx) {
-  if (idx < 0 || idx >= cells.length) return null;
-  const v = parseFloat(cells[idx]);
-  return isNaN(v) ? null : v;
+function txPitcher(p) {
+  const ipDec = ipToDec(p.ip);
+  const whip = ipDec>0 ? Math.round((p.h+p.bb)/ipDec*100)/100 : null;
+  const kbb  = p.bb>0  ? Math.round(p.so/p.bb*100)/100 : null;
+  return { name:p.name, G:p.g, IP:p.ip, ERA:p.era, WHIP:whip, K_BB:kbb,
+           K:p.so, BB:p.bb, H:p.h, R:p.r, ER:p.er, W:p.w, L:p.l, SV:p.s };
 }
-
-// ══════════════════════════════════════════════
-// MD 파서
-// 선행/후행 | 에서 오는 빈 토큰 각 1개만 제거
-// 내부 빈 셀은 보존하여 컬럼 인덱스 일치 유지
-// ══════════════════════════════════════════════
-function parseMDTableBlock(text) {
-  const lines = text.split('\n');
-  const tables = [];
-  let hdrs = null, rows = [];
-  for (const raw of lines) {
-    const line = raw.trim();
-    if (!line.startsWith('|')) {
-      if (hdrs) { tables.push({ headers: hdrs, rows }); hdrs = null; rows = []; }
-      continue;
-    }
-    const parts = line.split('|').map(c => c.trim());
-    const s = parts[0] === '' ? 1 : 0;
-    const e = parts[parts.length - 1] === '' ? parts.length - 1 : parts.length;
-    const cells = parts.slice(s, e);
-    if (cells.length < 2) continue;
-    const nonEmpty = cells.filter(c => c);
-    if (nonEmpty.length > 0 && nonEmpty.every(c => /^:?-+:?$/.test(c))) continue;
-    if (!hdrs) hdrs = cells;
-    else rows.push(cells);
-  }
-  if (hdrs) tables.push({ headers: hdrs, rows });
-  return tables;
-}
-
-function splitSections(content) {
-  const lines = content.split('\n');
-  const sections = [{ name: '__root__', lines: [] }];
-  for (const line of lines) {
-    const m = line.match(/^#{1,3}\s+(.+)/);
-    if (m) sections.push({ name: m[1].trim(), lines: [] });
-    else sections[sections.length - 1].lines.push(line);
-  }
-  return sections.map(s => ({ name: s.name, text: s.lines.join('\n') }));
-}
-
-// ══════════════════════════════════════════════
-// 요약시트 파서 (buildBatters, buildPitchers 등)
-// ══════════════════════════════════════════════
-function buildBatters(headers, rows) {
-  if (!headers) return [];
-  const c = {
-    AVG: ci(headers,'타율'), G: ci(headers,'경기'), H: ci(headers,'안타'),
-    HR: ci(headers,'홈런'), RBI: ci(headers,'타점'), R: ci(headers,'득점'),
-    SB: ci(headers,'도루'), BB: ci(headers,'볼넷'), SO: ci(headers,'삼진'),
-    PA: ci(headers,'타석'), OBP: ci(headers,'OBP','출루율'),
-    SLG: ci(headers,'SLG','장타율'), OPS: ci(headers,'OPS'),
-  };
-  return rows
-    .filter(r => r.length > 5 && r[0] && r[0] !== 'NO_HEADER' && !/^\d+$/.test(r[0]))
-    .map(r => ({
-      name: r[0], AVG: num(r,c.AVG), G: num(r,c.G), H: num(r,c.H),
-      HR: num(r,c.HR), RBI: num(r,c.RBI), R: num(r,c.R), SB: num(r,c.SB),
-      BB: num(r,c.BB), SO: num(r,c.SO), PA: num(r,c.PA),
-      OBP: num(r,c.OBP), SLG: num(r,c.SLG), OPS: num(r,c.OPS),
-    }))
-    .filter(b => b.G > 0 && b.OPS !== null);
-}
-
-function buildPitchers(headers, rows) {
-  if (!headers) return [];
-  const c = {
-    ERA: ci(headers,'ERA','평균자책점'), G: ci(headers,'등판'),
-    IP: ci(headers,'이닝'), K: ci(headers,'탈삼진'), R: ci(headers,'실점'),
-    ER: ci(headers,'자책점'), WHIP: ci(headers,'WHIP'), K_BB: ci(headers,'K/BB'),
-    W: ci(headers,'승'), L: ci(headers,'패'), SV: ci(headers,'세이브'),
-  };
-  return rows
-    .filter(r => r.length > 3 && r[0] && r[0] !== 'NO_HEADER' && !/^\d+$/.test(r[0]))
-    .map(r => ({
-      name: r[0], ERA: num(r,c.ERA), G: num(r,c.G), IP: num(r,c.IP),
-      K: num(r,c.K), R: num(r,c.R), ER: num(r,c.ER),
-      WHIP: num(r,c.WHIP), K_BB: num(r,c.K_BB),
-      W: num(r,c.W), L: num(r,c.L), SV: num(r,c.SV),
-    }))
-    .filter(p => p.G > 0 && p.ERA !== null);
-}
-
-function buildGames(headers, rows) {
-  if (!headers) return [];
-  // Format A: 상세기록 사이트 형태 — VS 포함
-  const isDetailFormat = headers.some(h => h.includes('경기결과')) || headers.some(h => h.includes('VS'));
-  if (isDetailFormat) {
-    const dateIdx = ci(headers,'날짜');
-    const venueIdx = ci(headers,'장소','구장');
-    const gameIdx = headers.findIndex(h => h.includes('VS') || h.includes('경기 ('));
-    const results = [];
-    for (const r of rows) {
-      if (r.length < 3 || !r[0] || r[0] === 'NO_HEADER') continue;
-      const date = dateIdx >= 0 ? r[dateIdx] : r[0];
-      const venue = venueIdx >= 0 ? r[venueIdx] : '';
-      const gameStr = gameIdx >= 0 ? r[gameIdx] : r[3] || '';
-      const vsMatch = gameStr.match(/(\d+)\s*VS\s*(\d+)/i);
-      if (!vsMatch) continue;
-      const leftScore = parseInt(vsMatch[1]);
-      const rightScore = parseInt(vsMatch[2]);
-      const rightPart = gameStr.slice(vsMatch.index + vsMatch[0].length);
-      const leftPart = gameStr.slice(0, vsMatch.index);
-      const ayOnRight = rightPart.includes('AY') || rightPart.includes('ay');
-      const ourScore = ayOnRight ? rightScore : leftScore;
-      const theirScore = ayOnRight ? leftScore : rightScore;
-      const oppPart = ayOnRight ? leftPart : rightPart;
-      const opp = oppPart.replace(/\d+/g,'').replace(/콜드승?|콜드패?/g,'').replace(/\s+/g,' ').trim();
-      const result = ourScore > theirScore ? '승' : ourScore < theirScore ? '패' : '무';
-      results.push({ date, venue, opp, scored: ourScore, allowed: theirScore, result, league: '정왕' });
-    }
-    return results;
-  }
-  // Format B: 직접 입력 형태
-  const c = {
-    date: ci(headers,'날짜'), league: ci(headers,'리그'),
-    opp: ci(headers,'상대팀'), scored: ci(headers,'득점'),
-    allowed: ci(headers,'실점'), result: ci(headers,'결과'), venue: ci(headers,'구장'),
-  };
-  return rows
-    .filter(r => r.length > 3 && r[0] && r[0] !== 'NO_HEADER')
-    .map(r => ({
-      date: c.date >= 0 ? r[c.date] : r[0], league: c.league >= 0 ? r[c.league] : '',
-      opp: c.opp >= 0 ? r[c.opp] : '', scored: num(r, c.scored),
-      allowed: num(r, c.allowed), result: c.result >= 0 ? r[c.result] : '',
-      venue: c.venue >= 0 ? r[c.venue] : '',
-    }))
-    .filter(g => g.date && g.opp);
-}
-
-function buildSummaryRecords(headers, rows) {
-  if (!headers) return [];
-  const c = {
-    season: ci(headers,'시즌','season'), league: ci(headers,'리그'),
-    W: ci(headers,'승'), L: ci(headers,'패'), D: ci(headers,'무'),
-  };
-  return rows
-    .filter(r => r.length > 2 && r[0] && r[0] !== 'NO_HEADER')
-    .map(r => ({
-      season: c.season >= 0 ? r[c.season] : r[0], league: c.league >= 0 ? r[c.league] : '',
-      W: num(r,c.W) || 0, L: num(r,c.L) || 0, D: num(r,c.D) || 0,
-    }));
-}
-
-function buildSchedule(headers, rows) {
-  if (!headers) return [];
-  const c = {
-    date: ci(headers,'날짜'), time: ci(headers,'시간'),
-    league: ci(headers,'리그'), opp: ci(headers,'상대팀'), venue: ci(headers,'구장'),
-  };
-  return rows
-    .filter(r => r.length > 2 && r[0] && r[0] !== 'NO_HEADER')
-    .map(r => ({
-      date: c.date >= 0 ? r[c.date] : r[0], time: c.time >= 0 ? r[c.time] : '',
-      league: c.league >= 0 ? r[c.league] : '', opp: c.opp >= 0 ? r[c.opp] : '',
-      venue: c.venue >= 0 ? r[c.venue] : '',
-    }))
-    .filter(s => s.date && s.opp);
-}
-
-// 붙여넣기 분리쌍 복원 (t1: 이름 / t2: 스탯)
-function pairSplitBatTable(tables, consumedIdx) {
-  const batters = [];
-  for (let i = 0; i < tables.length - 1; i++) {
-    const t1 = tables[i], t2 = tables[i + 1];
-    if (!t1.headers || !t2.headers) continue;
-    const t1HasName = t1.headers.some(h => h === '선수명');
-    const t2HasAVG  = t2.headers.some(h => h.includes('타율'));
-    const t2HasOPS  = t2.headers.some(h => h === 'OPS');
-    if (!t1HasName || !t2HasAVG || !t2HasOPS) continue;
-    const h = t2.headers;
-    const fnd = (...kws) => { for (const k of kws) { const i = h.findIndex(x => x === k || x.includes(k)); if (i >= 0) return i; } return -1; };
-    const c = {
-      AVG: fnd('타율'), G: fnd('경기'), PA: fnd('타석'), AB: fnd('타수'),
-      H: fnd('안타'), H2: fnd('2루타'), H3: fnd('3루타'), HR: fnd('홈런'),
-      RBI: fnd('타점'), R: fnd('득점'), SB: fnd('도루'),
-      BB: fnd('볼넷'), HBP: fnd('사구'), K: fnd('삼진'),
-      SLG: fnd('장타율'), OBP: fnd('출루율'), OPS: fnd('OPS'),
-    };
-    const n = Math.min(t1.rows.length, t2.rows.length);
-    for (let j = 0; j < n; j++) {
-      const r1 = t1.rows[j], r2 = t2.rows[j];
-      const name = (r1[1] || '').replace(/\s*\(\d+\)/, '').trim();
-      if (!name) continue;
-      const get  = k => { const v = parseFloat(r2[c[k]]); return isNaN(v) ? 0 : v; };
-      const getF = k => { const v = parseFloat(r2[c[k]]); return isNaN(v) ? null : v; };
-      batters.push({
-        name, G: get('G'), PA: get('PA'), AB: get('AB'),
-        H: get('H'), H2: get('H2'), H3: get('H3'), HR: get('HR'),
-        RBI: get('RBI'), R: get('R'), SB: get('SB'),
-        BB: get('BB'), HBP: get('HBP'), K: get('K'),
-        AVG: getF('AVG'), SLG: getF('SLG'), OBP: getF('OBP'), OPS: getF('OPS'),
-      });
-    }
-    if (batters.length) { consumedIdx.add(i); consumedIdx.add(i + 1); i++; }
-  }
-  return batters;
-}
-
-function pairSplitSummaryTables(tables) {
-  const results = [];
-  for (let i = 0; i < tables.length - 1; i++) {
-    const t1 = tables[i], t2 = tables[i + 1];
-    if (!t1.headers || !t2.headers) continue;
-    const hasYear = t1.headers.some(h => h.includes('연도') || h.includes('시즌'));
-    const hasWL   = t2.headers.some(h => h === '승') && t2.headers.some(h => h === '패');
-    if (!hasYear || !hasWL) continue;
-    const wIdx  = t2.headers.findIndex(h => h === '승');
-    const lIdx  = t2.headers.findIndex(h => h === '패');
-    const dIdx  = t2.headers.findIndex(h => h === '무');
-    const lgIdx = t1.headers.findIndex(h => h.includes('리그'));
-    const n = Math.min(t1.rows.length, t2.rows.length);
-    for (let j = 0; j < n; j++) {
-      const r1 = t1.rows[j], r2 = t2.rows[j];
-      const year = r1[0] || '';
-      const league = lgIdx >= 0 ? (r1[lgIdx] || '정왕') : '정왕';
-      const W = parseInt(r2[wIdx]) || 0;
-      const L = parseInt(r2[lIdx]) || 0;
-      const D = dIdx >= 0 ? (parseInt(r2[dIdx]) || 0) : 0;
-      if ((W + L + D) > 0 && year) results.push({ season: year, league, W, L, D });
-    }
-    i++;
-  }
-  return results;
-}
-
-// ══════════════════════════════════════════════
-// 경기별 파서 — 정왕 flat block 형식
-// ══════════════════════════════════════════════
-
-// rows를 순서대로 스캔: AY 타자 서브헤더·선수행 추출
-// events 제거 (H2/H3/HR은 타석별 셀에서 직접 추출)
-function extractGameBlockData(tableRows) {
-  let mode = null;  // 'bat' | 'pit' | 'skip'
-  let batHdrs = null, pitHdrs = null;
-  const batRows = [], pitRows = [];
-
-  for (const row of tableRows) {
-    if (!row || row.length < 2) continue;
-    const c0 = (row[0] || '').trim();
-
-    // AY 타자 서브헤더: col0에 'AY', '타석' 있고 '등판' 없음
-    if (c0.includes('AY') && row.some(c => c === '타석') && !row.some(c => c === '등판')) {
-      mode = 'bat'; batHdrs = row; continue;
-    }
-    // AY 투수 서브헤더
-    if (c0.includes('AY') && row.some(c => c === '등판')) { mode = 'pit'; pitHdrs = row; continue; }
-    // 상대팀 서브헤더 → skip
-    if (c0 && !/^\d$/.test(c0) && !['Total','합계','소계',''].includes(c0)) {
-      if (row.some(c => c === '타석') || row.some(c => c === '등판')) { mode = 'skip'; continue; }
-    }
-    // 선수 행 (타순 1-9)
-    if (/^\d$/.test(c0)) {
-      if (mode === 'bat' && batHdrs) batRows.push(row);
-      if (mode === 'pit' && pitHdrs) pitRows.push(row);
-      continue;
-    }
-  }
-  return { batHdrs, batRows, pitHdrs, pitRows };
-}
-
-// 이닝 문자열 "2.1" → 2+1/3 이닝으로 변환
-function parseIP(raw) {
-  const s = String(raw || '0');
-  const [full, frac] = s.split('.');
-  return (parseInt(full) || 0) + (frac ? parseInt(frac) / 3 : 0);
-}
-
-// 정왕 형식 AY 투수 테이블
-// header[0] = 'AY...', '등판' + '이닝' 컬럼 필요
-function extractAYGamePitchers(headers, rows) {
-  if (!headers[0] || !headers[0].includes('AY')) return null;
-  if (!headers.some(h => h === '등판') || !headers.some(h => h === '이닝')) return null;
-  const fi = (...kws) => { for (const k of kws) { const i = headers.findIndex(x => x === k || x.includes(k)); if (i >= 0) return i; } return -1; };
-  const ipIdx = fi('이닝'), hIdx = fi('피안타'), hrIdx = fi('홈런');
-  const bbIdx = fi('4사구'), kIdx = fi('삼진'), rIdx = fi('실점');
-  const erIdx = fi('자책'), resIdx = fi('결과');
-  return rows
-    .filter(r => {
-      const name = (r[1] || '').replace(/\s*\(\d+\)/, '').trim();
-      return name && !/^(Total|AY)/.test(name);
-    })
-    .map(r => ({
-      name: r[1].replace(/\s*\(\d+\)/, '').trim(),
-      ip: parseIP(r[ipIdx]),
-      H: parseInt(r[hIdx]) || 0, HR: parseInt(r[hrIdx]) || 0,
-      BB: parseInt(r[bbIdx]) || 0, K: parseInt(r[kIdx]) || 0,
-      R: parseInt(r[rIdx]) || 0, ER: parseInt(r[erIdx]) || 0,
-      result: r[resIdx] || '',
-    }));
-}
-
-// ══════════════════════════════════════════════
-// 경기별 파서 — 안양 외부사이트 붙여넣기 형식
-// ══════════════════════════════════════════════
-
-// 안양 득점 테이블 → 게임 결과 추출
-// 형식: header에 'R' 컬럼, rows에 팀별 득점
-function extractAYSheetScores(headers, rows) {
-  if (!headers) return null;
-  // 팀명|1회|...|R 형식(정왕) 및 안양 외부사이트 R컬럼 형식 모두 처리
-  const rIdx = headers.findIndex(h => h === 'R' || h === '총득점' || h === '득점');
-  if (rIdx < 0) return null;
-  // 이닝 컬럼(숫자)이 충분히 있어야 점수표
-  const numericHdrs = headers.filter(h => /^\d+회?$/.test(h) || /^[1-9]$/.test(h));
-  if (numericHdrs.length < 3) return null;
-
-  const teams = [];
-  for (const row of rows) {
-    if (!row[0] || row[0] === 'NO_HEADER') continue;
-    const teamName = (row[0] || '').trim();
-    const runs = parseInt(row[rIdx]);
-    if (!teamName || isNaN(runs)) continue;
-    teams.push({ team: teamName, runs });
-  }
-  if (teams.length < 2) return null;
-
-  const ayRow  = teams.find(t => t.team.includes('AY') || t.team.includes('션샤인'));
-  const oppRow = teams.find(t => !t.team.includes('AY') && !t.team.includes('션샤인'));
-  if (!ayRow || !oppRow) return null;
-
+function buildData(json) {
+  const games    = json.games    || [];
+  const batters  = (json.batters  || []).map(txBatter);
+  const pitchers = (json.pitchers || []).map(txPitcher);
   return {
-    scored:  ayRow.runs,
-    allowed: oppRow.runs,
-    opp:     oppRow.team,
-    result:  ayRow.runs > oppRow.runs ? '승' : ayRow.runs < oppRow.runs ? '패' : '무',
+    all: { batters, pitchers, games },
+    jw:  { batters, pitchers, games: games.filter(g=>g.league==='정왕') },
+    ay:  { batters, pitchers, games: games.filter(g=>g.league==='안양') },
   };
 }
 
-// 안양 NO_HEADER 점수표
-// headers: ['NO_HEADER','11','11','4','4','0'] (상대팀 행)
-// rows[0]:  ['NO_HEADER','5','6','3','6','0']  (AY 행 — 후공)
-// ※ MCP 반환값에 마크다운 이스케이프 'NO\_HEADER'로 오는 경우도 처리
-function extractNoHeaderScore(headers, rows) {
-  if (!headers) return null;
-  const stripBs = s => (s || '').replace(/\\/g, '');
-  if (stripBs(headers[0]) !== 'NO_HEADER') return null;
-  const isNum = v => v !== '' && !isNaN(parseFloat(v));
-  if (headers.length < 3 || !headers.slice(1).every(isNum)) return null;
-  if (!rows.length || stripBs(rows[0][0]) !== 'NO_HEADER') return null;
-  if (!rows[0].slice(1).every(isNum)) return null;
-  const oppRuns = parseInt(headers[1]);
-  const ayRuns  = parseInt(rows[0][1]);
-  if (isNaN(oppRuns) || isNaN(ayRuns)) return null;
-  return {
-    scored:  ayRuns,
-    allowed: oppRuns,
-    result:  ayRuns > oppRuns ? '승' : ayRuns < oppRuns ? '패' : '무',
-  };
-}
+// ── KPI ──
+function renderOverview(batters, pitchers, games) {
+  const gW=games.filter(g=>g.result==='승').length;
+  const gL=games.filter(g=>g.result==='패').length;
+  const gD=games.filter(g=>g.result==='무').length;
+  const totG=gW+gL+gD;
+  const winPct = totG>0 ? (gW/totG).toFixed(3) : '-';
+  const totAB = batters.reduce((s,b)=>s+b.AB,0);
+  const totH  = batters.reduce((s,b)=>s+b.H,0);
+  const teamAVG = totAB>0 ? (totH/totAB).toFixed(3) : '-';
+  const vp = pitchers.filter(p=>p.IP>0);
+  const totIpDec = vp.reduce((s,p)=>s+ipToDec(p.IP),0);
+  const totER    = vp.reduce((s,p)=>s+(p.ER||0),0);
+  const teamERA  = totIpDec>0 ? (totER*7/totIpDec).toFixed(2) : '-';
+  const totSB = batters.reduce((s,b)=>s+(b.SB||0),0);
+  const totK  = pitchers.reduce((s,p)=>s+(p.K||0),0);
 
-// 안양 타자 테이블
-// header[0] = 'AY...' + 9개 빈 열 + '타석'(paIdx=10)
-// player row: col0=타순, col1=이름, col2=포지션, col3-11=타석셀(9개), col12=PA합계
-function extractAYSheetBatters(headers, rows) {
-  if (!headers[0] || !headers[0].includes('AY')) return null;
-  if (!headers.some(h => h === '타석') || !headers.some(h => h === '안타')) return null;
-  if (headers.some(h => h === '등판')) return null;
-
-  const fi = (...kws) => { for (const k of kws) { const i = headers.findIndex(x => x === k); if (i >= 0) return i; } return -1; };
-  const paHdr = fi('타석');
-  if (paHdr < 9) return null;  // 안양 형식만 (빈 열 9개 후 타석)
-
-  // 헤더 기준 abCount = paHdr - 1 (빈 열 수 = 실제 타석수)
-  const abCount    = paHdr - 1;
-  const abIndices  = Array.from({ length: abCount }, (_, i) => i + 3);
-  const colOffset  = 2;  // header col0(AY 1셀) vs player col0-2(타순+이름+포지션 3셀)
-
-  const paIdx  = paHdr  + colOffset;
-  const abIdx  = fi('타수')  >= 0 ? fi('타수')  + colOffset : -1;
-  const hIdx   = fi('안타')  >= 0 ? fi('안타')  + colOffset : -1;
-  const rbiIdx = fi('타점')  >= 0 ? fi('타점')  + colOffset : -1;
-  const rIdx   = fi('득점')  >= 0 ? fi('득점')  + colOffset : -1;
-  const sbIdx  = fi('도루')  >= 0 ? fi('도루')  + colOffset : -1;
-
-  return rows
-    .filter(r => {
-      const name = (r[1] || '').replace(/\s*\(\d+\)/, '').trim();
-      return name && /^\d/.test(r[0]) && !/^(Total|합계|AY|소계)/.test(name);
-    })
-    .map(r => {
-      const name = r[1].replace(/\s*\(\d+\)/, '').trim();
-      const { h2, h3, hr } = xbhFromAtbats(r, abIndices);
-      return {
-        name,
-        PA:  parseInt(r[paIdx])  || 0,
-        AB:  parseInt(r[abIdx])  || 0,
-        H:   parseInt(r[hIdx])   || 0,
-        H2: h2, H3: h3, HR: hr,
-        RBI: parseInt(r[rbiIdx]) || 0,
-        R:   parseInt(r[rIdx])   || 0,
-        SB:  parseInt(r[sbIdx])  || 0,
-      };
-    })
-    .filter(b => b.name.length > 0);
-}
-
-// 안양 투수 테이블
-// header: | 팀 | 선수 | 결과 | 교체 | 이닝 | 타자 | 투구 | 안타 | 홈런 | 4구 | 사구 | 삼진 | 실점 | 자 책 | 방어율 |
-// 양팀 모두 포함 → AY 행만 필터
-function extractAYSheetPitchers(headers, rows) {
-  if (!headers || headers.length < 5) return null;
-  if (headers[0] !== '팀' || headers[1] !== '선수') return null;
-  if (!headers.some(h => h === '이닝')) return null;
-
-  const fi = (...kws) => { for (const k of kws) { const i = headers.findIndex(x => x === k || x.includes(k)); if (i >= 0) return i; } return -1; };
-  const ipIdx  = fi('이닝');
-  const hIdx   = fi('안타');
-  const hrIdx  = fi('홈런');
-  const bbIdx  = fi('4구');
-  const kIdx   = fi('삼진');
-  const rIdx   = fi('실점');
-  const erIdx  = fi('자 책', '자책');
-  const resIdx = fi('결과');
-
-  return rows
-    .filter(r => {
-      const team = (r[0] || '').trim();
-      return team.includes('AY') || team.includes('션샤인');
-    })
-    .map(r => {
-      const name = (r[1] || '').replace(/\s*\(\d+\)/, '').trim();
-      return {
-        name,
-        ip: parseIP(r[ipIdx]),
-        H:  parseInt(r[hIdx])  || 0,
-        HR: parseInt(r[hrIdx]) || 0,
-        BB: parseInt(r[bbIdx]) || 0,
-        K:  parseInt(r[kIdx])  || 0,
-        R:  parseInt(r[rIdx])  || 0,
-        ER: parseInt(r[erIdx]) || 0,
-        result: r[resIdx] || '',
-      };
-    })
-    .filter(p => p.name && !/^(팀|합계|Total)/.test(p.name));
-}
-
-// ══════════════════════════════════════════════
-// 타석별 셀에서 장타 분류 (H2 / H3 / HR)
-// 좌2, 중2, 우2 → 2루타 / 좌3 → 3루타 / 홈 → 홈런
-// ══════════════════════════════════════════════
-function xbhFromAtbats(row, abIndices) {
-  let h2 = 0, h3 = 0, hr = 0;
-  for (const idx of abIndices) {
-    if (idx >= row.length) continue;
-    const cell = (row[idx] || '').trim();
-    if (!cell) continue;
-    if (cell.includes('홈')) { hr++; }
-    else if (/[가-힣]3(?:[,\s]|$)/.test(cell)) { h3++; }
-    else if (/[가-힣]2(?:[,\s]|$)/.test(cell)) { h2++; }
-  }
-  return { h2, h3, hr };
-}
-
-// 정왕 형식 AY 타자 테이블 (paIdx < 9)
-// header[0] = 'AY...', 타석/안타 있고 등판 없음
-function extractAYGameBatters(headers, rows) {
-  if (!headers[0] || !headers[0].includes('AY')) return null;
-  if (!headers.some(h => h === '타석') || !headers.some(h => h === '안타')) return null;
-  if (headers.some(h => h === '등판')) return null;
-
-  const fi = (...kws) => { for (const k of kws) { const i = headers.findIndex(x => x === k); if (i >= 0) return i; } return -1; };
-  const paIdx  = fi('타석');
-  const abIdx  = fi('타수');
-  const hIdx   = fi('안타');
-  const rbiIdx = fi('타점');
-  const rIdx   = fi('득점');
-  const sbIdx  = fi('도루');
-
-  // 안양 외부사이트 포맷은 extractAYSheetBatters 에서 처리
-  // 정왕 6이닝 형식은 paIdx=9, 안양 외부사이트는 paIdx=10 → 10부터 안양으로 분기
-  if (paIdx >= 10) return null;
-
-  const abIndices = paIdx > 3 ? Array.from({ length: paIdx - 3 }, (_, i) => i + 3) : [];
-
-  return rows
-    .filter(r => {
-      const name = (r[1] || '').replace(/\s*\(\d+\)/, '').trim();
-      return name && !/^(Total|합계|AY|소계)/.test(name);
-    })
-    .map(r => {
-      const name = r[1].replace(/\s*\(\d+\)/, '').trim();
-      const { h2, h3, hr } = xbhFromAtbats(r, abIndices);
-      return {
-        name,
-        PA:  parseInt(r[paIdx])  || 0,
-        AB:  parseInt(r[abIdx])  || 0,
-        H:   parseInt(r[hIdx])   || 0,
-        H2: h2, H3: h3, HR: hr,
-        RBI: parseInt(r[rbiIdx]) || 0,
-        R:   parseInt(r[rIdx])   || 0,
-        SB:  parseInt(r[sbIdx])  || 0,
-      };
-    })
-    .filter(b => b.name.length > 0);
-}
-
-// ══════════════════════════════════════════════
-// 누적 집계
-// ══════════════════════════════════════════════
-
-// ERA = 자책 × 7 / 이닝 (사회인 야구 7이닝 기준)
-function aggregateGamePitchers(rows) {
-  const map = {};
-  for (const p of rows) {
-    if (!map[p.name]) map[p.name] = { name: p.name, G: 0, IP: 0, H: 0, HR: 0, BB: 0, K: 0, R: 0, ER: 0, W: 0, L: 0, SV: 0 };
-    const m = map[p.name];
-    m.G++; m.IP += p.ip; m.H += p.H; m.HR += p.HR;
-    m.BB += p.BB; m.K += p.K; m.R += p.R; m.ER += p.ER;
-    if (/^(승|w)$/i.test(p.result)) m.W++;
-    if (/^(패|l)$/i.test(p.result)) m.L++;
-    if (/^(세이브|sv?)$/i.test(p.result)) m.SV++;
-  }
-  return Object.values(map).map(p => ({
-    ...p,
-    ERA:  p.IP > 0 ? Math.round(p.ER / p.IP * 7 * 100) / 100 : null,
-    WHIP: p.IP > 0 ? Math.round((p.H + p.BB) / p.IP * 100) / 100 : null,
-    K_BB: p.BB > 0 ? Math.round(p.K / p.BB * 100) / 100 : null,
-  }));
-}
-
-// eventsList 파라미터 제거 — H2/H3/HR은 batRows에서 직접 합산
-function aggregateGameBatters(batRows) {
-  const map = {};
-  for (const b of batRows) {
-    if (!map[b.name]) map[b.name] = { name: b.name, G: 0, PA: 0, AB: 0, H: 0, H2: 0, H3: 0, HR: 0, RBI: 0, R: 0, SB: 0 };
-    const m = map[b.name];
-    m.G++;
-    m.PA += b.PA; m.AB += b.AB; m.H += b.H;
-    m.H2 += (b.H2 || 0); m.H3 += (b.H3 || 0); m.HR += (b.HR || 0);
-    m.RBI += b.RBI; m.R += b.R; m.SB += b.SB;
-  }
-  return Object.values(map).map(p => {
-    const HR = p.HR, H3 = p.H3, H2 = p.H2;
-    const H1 = Math.max(0, p.H - HR - H3 - H2);
-    const AVG = p.AB > 0 ? p.H / p.AB : null;
-    const OBP = p.PA > 0 ? (p.H + (p.PA - p.AB)) / p.PA : null;
-    const SLG = p.AB > 0 ? (H1 + 2*H2 + 3*H3 + 4*HR) / p.AB : null;
-    const OPS = (OBP !== null && SLG !== null) ? OBP + SLG : null;
-    return { ...p, BB: p.PA - p.AB, SO: null, AVG, OBP, SLG, OPS };
-  }).filter(b => b.G > 0);
-}
-
-// ══════════════════════════════════════════════
-// parseAll — 전체 시트 파싱
-// ══════════════════════════════════════════════
-function parseAll(content) {
-  const sections = splitSections(content);
-  let allBat = [], allPit = [], jwBat = [], jwPit = [], ayBat = [], ayPit = [];
-  let allGames = [], allSched = [], allSummary = [];
-
-  for (const sec of sections) {
-    const tables = parseMDTableBlock(sec.text);
-    const n = sec.name.toLowerCase();
-    const isJW = n.includes('정왕') || n.includes('jw');
-    const isAY = n.includes('안양') || n.includes('ay');
-    const isGame = n.includes('경기기록') || n.includes('경기 기록');
-    const isSched = n.includes('일정');
-    const isSummaryRec = n.includes('전적요약') || n.includes('역대전적');
-
-    // 역대전적 분리쌍 복원
-    const splitPaired = pairSplitSummaryTables(tables);
-    if (splitPaired.length) allSummary.push(...splitPaired);
-
-    const gamePitRows = [], gameBatRows = [];
-    let curLg = isJW ? 'jw' : isAY ? 'ay' : null;
-    let lastAYOpp = '', lastAYDate = '';
-
-    for (let ti = 0; ti < tables.length; ti++) {
-      const tbl = tables[ti];
-      const h = tbl.headers, r = tbl.rows;
-      if (!h || h.length === 0) continue;
-
-      // ① 안양 게임 헤더 테이블 (단일컬럼 날짜 형식: ['2026-04-11 7:04:12'])
-      // ← h.length < 2 가드보다 먼저 처리해야 skip 안 됨
-      if (h.length === 1 && /^\d{4}-\d{2}-\d{2}/.test(h[0])) {
-        const oppCandidates = r.map(row => (row[0]||'').trim())
-          .filter(name => name && !name.includes('AY') && !name.includes('션샤인')
-            && !name.includes('◆') && !/^\d/.test(name) && !/^■/.test(name) && name.length > 1);
-        if (oppCandidates.length > 0) {
-          lastAYOpp = oppCandidates[0];
-          const dateRow = r.find(row => /\d{4}년\s*\d+월\s*\d+일/.test(row[0]||''));
-          lastAYDate = dateRow
-            ? ((dateRow[0].match(/\d{4}년\s*\d+월\s*\d+일/)||[])[0] || h[0].slice(0,10))
-            : h[0].slice(0,10);
-          curLg = 'ay';
-        }
-        continue;
-      }
-
-      // 2컬럼 미만 테이블은 이후 파싱 불필요
-      if (h.length < 2) continue;
-
-      // 구장 키워드로 현재 리그 감지
-      const allCells = [...h, ...r.flat()];
-      for (const cell of allCells) {
-        if (!cell) continue;
-        if (cell.includes('정왕야구장') || cell.includes('정왕 야구장')) { curLg = 'jw'; break; }
-        if (cell.includes('안양야구장') || cell.includes('안양 야구장')) { curLg = 'ay'; break; }
-      }
-
-      // ② 점수표 → 게임 결과 추출 (R 컬럼 형식: 팀명|1회|...|R 또는 안양 형식)
-      const gameScore = extractAYSheetScores(h, r);
-      if (gameScore) {
-        const isJWGame = curLg === 'jw';
-        const lg = isJWGame ? '정왕' : '안양';
-        const venue = isJWGame ? '정왕야구장' : '안양야구장';
-        // 정왕: rows에 게임 날짜 행 포함 ('MM.DD' 패턴 col0)
-        let gameDate = isJWGame ? '' : (lastAYDate || '');
-        if (isJWGame) {
-          const dateRow = r.find(row => row[0] && /^\d{2}\.\d{2}/.test(row[0]));
-          if (dateRow) gameDate = dateRow[0];
-        }
-        allGames.push({ ...gameScore, date: gameDate, opp: gameScore.opp || lastAYOpp, venue, league: lg });
-        if (isJWGame) {
-          // 정왕: 같은 테이블 rows에 선수 데이터 포함 → 추출
-          const { batHdrs, batRows, pitHdrs, pitRows } = extractGameBlockData(r);
-          if (batHdrs && batRows.length) {
-            const bat = extractAYGameBatters(batHdrs, batRows);
-            if (bat) gameBatRows.push(...bat.map(b => ({ ...b, lg: 'jw' })));
-          }
-          if (pitHdrs && pitRows.length) {
-            const pit = extractAYGamePitchers(pitHdrs, pitRows);
-            if (pit) gamePitRows.push(...pit.map(p => ({ ...p, lg: 'jw' })));
-          }
-        } else {
-          curLg = 'ay';
-        }
-        continue;
-      }
-
-      // ②-b 안양 점수표 (NO_HEADER 형식)
-      const nhScore = extractNoHeaderScore(h, r);
-      if (nhScore) {
-        allGames.push({ ...nhScore, date: lastAYDate || '', opp: lastAYOpp, venue: '안양야구장', league: '안양' });
-        curLg = 'ay';
-        continue;
-      }
-
-      // ②-c 안양 상대팀 타자 테이블 헤더 → lastAYOpp 캐시
-      // 안양 외부사이트: h[0]=상대팀명, 타석 있고 이닝 없음
-      if (h[0] && !h[0].includes('AY') && !h[0].includes('션샤인')
-          && h.some(c => c === '타석') && !h.some(c => c === '이닝')
-          && h[0] !== '팀명' && h[0] !== '선수명') {
-        lastAYOpp = h[0];
-      }
-
-      // ③ 안양 투수 테이블 (팀|선수|이닝 형식)
-      const ayPit_ = extractAYSheetPitchers(h, r);
-      if (ayPit_) { gamePitRows.push(...ayPit_.map(p => ({ ...p, lg: 'ay' }))); continue; }
-
-      // ④ 안양 타자 테이블 (AY + 9개 빈열 + 타석)
-      const aySheetBat = extractAYSheetBatters(h, r);
-      if (aySheetBat) { gameBatRows.push(...aySheetBat.map(b => ({ ...b, lg: 'ay' }))); continue; }
-
-      // ⑤ 정왕 flat game block — 2가지 포맷
-      // 포맷A: h[0]='05.09' (날짜가 header col0, rows=선수데이터)
-      // 포맷B: h[0]='날짜' (컬럼명이 header, rows=경기행+선수데이터 혼합)
-      const isGameFlatBlockA = h[0] && /^\d{2}\.\d{2}/.test(h[0]) && h.some(c => c && c.includes('VS'));
-      const isGameFlatBlockB = h[0] === '날짜' && h.some(c => c && c.includes('VS'));
-      if (isGameFlatBlockA || isGameFlatBlockB) {
-        if (isGameFlatBlockA) {
-          const synHdrs = ['날짜','시간','구장','경기 (선공 VS 후공)','경기결과',''];
-          allGames.push(...buildGames(synHdrs, [h]));
-        } else {
-          allGames.push(...buildGames(h, r));
-        }
-        const { batHdrs, batRows, pitHdrs, pitRows } = extractGameBlockData(r);
-        if (batHdrs && batRows.length) {
-          const bat = extractAYGameBatters(batHdrs, batRows);
-          if (bat) gameBatRows.push(...bat.map(b => ({ ...b, lg: curLg })));
-        }
-        if (pitHdrs && pitRows.length) {
-          const pit = extractAYGamePitchers(pitHdrs, pitRows);
-          if (pit) gamePitRows.push(...pit.map(p => ({ ...p, lg: curLg })));
-        }
-        continue;
-      }
-
-      // ⑥ 정왕 AY 투수 서브테이블
-      const jwPit_ = extractAYGamePitchers(h, r);
-      if (jwPit_) { gamePitRows.push(...jwPit_.map(p => ({ ...p, lg: curLg }))); continue; }
-
-      // ⑦ 정왕 AY 타자 서브테이블 (paIdx < 10; 정왕=9, 안양=10)
-      const jwBat_ = extractAYGameBatters(h, r);
-      if (jwBat_) { gameBatRows.push(...jwBat_.map(b => ({ ...b, lg: curLg }))); continue; }
-
-      // ⑧ 요약 전적 (승+패+연도)
-      const hasSeasonCol = h.some(c => c.includes('시즌') || c.includes('연도') || c.toLowerCase().includes('season'));
-      if (isSummaryRec || (h.some(c => c === '승') && h.some(c => c === '패') && !h.some(c => c.includes('상대팀')) && hasSeasonCol)) {
-        allSummary.push(...buildSummaryRecords(h, r)); continue;
-      }
-
-      // ⑧ 게임 결과 테이블
-      if (isGame || (h.some(c => c.includes('상대팀')) && h.some(c => c.includes('결과'))) ||
-          h.some(c => c.includes('경기결과')) || h.some(c => c.includes('VS'))) {
-        allGames.push(...buildGames(h, r)); continue;
-      }
-
-      // ⑨ 일정 테이블
-      if (isSched || (h.some(c => c.includes('상대팀')) && h.some(c => c.includes('구장')) && !h.some(c => c.includes('결과')))) {
-        allSched.push(...buildSchedule(h, r)); continue;
-      }
-
-      // ⑩ 요약시트 투수 (WHIP 컬럼)
-      if (h.some(c => c.includes('WHIP'))) {
-        const pit = buildPitchers(h, r);
-        if (isJW) jwPit.push(...pit);
-        else if (isAY) ayPit.push(...pit);
-        else allPit.push(...pit);
-        continue;
-      }
-
-      // ⑪ 요약시트 타자 (타율+OPS)
-      if (h.some(c => c.includes('타율')) && h.some(c => c.includes('OPS'))) {
-        const bat = buildBatters(h, r);
-        if (isJW) jwBat.push(...bat);
-        else if (isAY) ayBat.push(...bat);
-        else allBat.push(...bat);
-        continue;
-      }
-    }
-
-    // 투수 집계
-    if (gamePitRows.length) {
-      const jwR = gamePitRows.filter(p => p.lg === 'jw');
-      const ayR = gamePitRows.filter(p => p.lg === 'ay');
-      const otR = gamePitRows.filter(p => !p.lg);
-      if (jwR.length) jwPit.push(...aggregateGamePitchers(jwR));
-      if (ayR.length) ayPit.push(...aggregateGamePitchers(ayR));
-      if (otR.length) {
-        const agg = aggregateGamePitchers(otR);
-        if (isJW) jwPit.push(...agg);
-        else if (isAY) ayPit.push(...agg);
-        else allPit.push(...agg);
-      }
-    }
-
-    // 타자 집계
-    if (gameBatRows.length) {
-      const jwR = gameBatRows.filter(b => b.lg === 'jw');
-      const ayR = gameBatRows.filter(b => b.lg === 'ay');
-      const otR = gameBatRows.filter(b => !b.lg);
-      if (jwR.length) jwBat.push(...aggregateGameBatters(jwR));
-      if (ayR.length) ayBat.push(...aggregateGameBatters(ayR));
-      if (otR.length) {
-        const agg = aggregateGameBatters(otR);
-        if (isJW) jwBat.push(...agg);
-        else if (isAY) ayBat.push(...agg);
-        else allBat.push(...agg);
-      }
-    }
-  }
-
-  // 경기 기록이 있으면 게임 파싱 우선, 없을 때만 요약시트 통산기록 fallback
-  const combinedBat = (jwBat.length + ayBat.length) > 0 ? [...jwBat, ...ayBat] : allBat;
-  const combinedPit = (jwPit.length + ayPit.length) > 0 ? [...jwPit, ...ayPit] : allPit;
-  const jwSummary = allSummary.filter(s => s.league.includes('정왕') || s.league.toLowerCase() === 'jw');
-  const aySummary = allSummary.filter(s => s.league.includes('안양') || s.league.toLowerCase() === 'ay');
-
-  return {
-    all: { batters: combinedBat, pitchers: combinedPit, games: allGames, schedule: allSched, summary: allSummary },
-    jw:  { batters: jwBat.length ? jwBat : combinedBat,
-           pitchers: jwPit.length ? jwPit : combinedPit,
-           games: allGames.filter(g => (g.league || '').includes('정왕') || (g.league || '').toLowerCase() === 'jw'),
-           schedule: allSched.filter(s => (s.league || '').includes('정왕')), summary: jwSummary },
-    ay:  { batters: ayBat.length ? ayBat : combinedBat,
-           pitchers: ayPit.length ? ayPit : combinedPit,
-           games: allGames.filter(g => (g.league || '').includes('안양') || (g.league || '').toLowerCase() === 'ay'),
-           schedule: allSched.filter(s => (s.league || '').includes('안양')), summary: aySummary },
-  };
-}
-
-// ══════════════════════════════════════════════
-// 팀 통계
-// ══════════════════════════════════════════════
-function teamStats(batters, pitchers, games, summary = []) {
-  const vb = batters.filter(b => b.AVG != null && b.G >= 3);
-  const teamAVG = vb.length ? vb.reduce((s, b) => s + (b.AVG || 0), 0) / vb.length : null;
-  const vp = pitchers.filter(p => p.ERA != null && p.IP > 0);
-  const totIP = vp.reduce((s, p) => s + (p.IP || 0), 0);
-  const teamERA = totIP > 0 ? vp.reduce((s, p) => s + (p.ERA || 0) * (p.IP || 0), 0) / totIP : null;
-
-  const gW = games.filter(g => /^(승|w)$/i.test(g.result)).length;
-  const gL = games.filter(g => /^(패|l)$/i.test(g.result)).length;
-  const gD = games.filter(g => /^(무|d)$/i.test(g.result)).length;
-  const sW = summary.reduce((s, r) => s + (r.W || 0), 0);
-  const sL = summary.reduce((s, r) => s + (r.L || 0), 0);
-  const sD = summary.reduce((s, r) => s + (r.D || 0), 0);
-  const W = gW + sW, L = gL + sL, D = gD + sD;
-  const totalG = W + L + D;
-
-  const totHR = batters.reduce((s, b) => s + (b.HR || 0), 0);
-  const totSB = batters.reduce((s, b) => s + (b.SB || 0), 0);
-  const totK  = pitchers.reduce((s, p) => s + (p.K || 0), 0);
-  const recent = games.slice(-5).reverse();
-  const thisYearG = gW + gL + gD;
-
-  return {
-    teamAVG, teamERA, W, L, D, totalG, winRate: totalG ? W / totalG : null,
-    thisYearG, gW, gL, gD, totHR, totSB, totK, recent,
-  };
-}
-
-// ══════════════════════════════════════════════
-// 렌더 헬퍼
-// ══════════════════════════════════════════════
-const fi = v => { const f = parseFloat(v); return isNaN(f) ? '-' : String(Math.round(f)); };
-const fd = (v, d = 3) => { const f = parseFloat(v); return isNaN(f) ? '-' : f.toFixed(d); };
-
-function renderOverview(batters, pitchers, games, schedule, summary = []) {
-  const ts = teamStats(batters, pitchers, games, summary);
-
-  document.getElementById('kpi-grid').innerHTML = `
+  document.getElementById('kpi-grid').innerHTML=`
     <div class="kpicard blue">
-      <div class="kpitit">팀 전적 (통산)</div>
-      <div class="kpival">${ts.totalG > 0 ? `${ts.W}승 ${ts.D}무 ${ts.L}패` : '기록 없음'}</div>
-      <div class="kpisub">${ts.thisYearG > 0 ? `올해 ${ts.gW}W · ${ts.gD}D · ${ts.gL}L` : `승률 ${ts.winRate != null ? ts.winRate.toFixed(3) : '-'}`}</div>
+      <div class="kpitit">팀 전적</div>
+      <div class="kpival">${totG>0?`${gW}승 ${gD}무 ${gL}패`:'기록 없음'}</div>
+      <div class="kpisub">승률 ${winPct}</div>
     </div>
     <div class="kpicard grn">
       <div class="kpitit">팀 타율 / ERA</div>
-      <div class="kpival">${ts.teamAVG != null ? ts.teamAVG.toFixed(3) : '-'}</div>
-      <div class="kpisub">ERA ${ts.teamERA != null ? ts.teamERA.toFixed(2) : '-'} (7이닝 기준)</div>
+      <div class="kpival">${teamAVG}</div>
+      <div class="kpisub">ERA ${teamERA} (7이닝 기준)</div>
     </div>
     <div class="kpicard">
-      <div class="kpitit">팀 홈런 / 도루</div>
-      <div class="kpival">${ts.totHR}</div>
-      <div class="kpisub">도루 ${ts.totSB}개</div>
+      <div class="kpitit">팀 도루</div>
+      <div class="kpival">${totSB}</div>
+      <div class="kpisub">타자 ${batters.length}명</div>
     </div>
     <div class="kpicard">
       <div class="kpitit">팀 탈삼진</div>
-      <div class="kpival">${ts.totK}</div>
-      <div class="kpisub">투수 ${pitchers.length}명 등판</div>
+      <div class="kpival">${totK}</div>
+      <div class="kpisub">투수 ${pitchers.length}명</div>
     </div>`;
 
+  const recent = games.slice(-5).reverse();
   const recEl = document.getElementById('recent-row');
-  if (ts.recent.length > 0) {
-    const dots = ts.recent.map(g => {
-      const cls = /^(승|w)$/i.test(g.result) ? 'w' : /^(패|l)$/i.test(g.result) ? 'l' : 'd';
-      return `<div class="dot ${cls}" title="${g.opp} ${g.scored??''}-${g.allowed??''}">${cls==='w'?'승':cls==='l'?'패':'무'}</div>`;
+  if (recent.length>0) {
+    const dots = recent.map(g=>{
+      const cls=g.result==='승'?'w':g.result==='패'?'l':'d';
+      return `<div class="dot ${cls}" title="${g.opp} ${g.scored}-${g.allowed}">${cls==='w'?'승':cls==='l'?'패':'무'}</div>`;
     }).join('');
-    recEl.innerHTML = `<div class="recent"><span class="rlab">최근</span><div class="dots">${dots}</div></div>`;
-  } else recEl.innerHTML = '';
-
-  const ngEl = document.getElementById('next-game');
-  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const upcoming = [...schedule].filter(s => s.date.replace(/\D/g, '') >= today).sort((a, b) => a.date.localeCompare(b.date));
-  if (upcoming.length > 0) {
-    const ng = upcoming[0];
-    ngEl.innerHTML = `<div class="nextgame">
-      <div class="ng-label">▶ 다음 경기${ng.league ? ' · ' + ng.league : ''}</div>
-      <div class="ng-opp">vs ${ng.opp}</div>
-      <div class="ng-meta">📅 ${ng.date}${ng.time ? '  ' + ng.time : ''}
-📍 ${ng.venue || '-'}</div>
-    </div>`;
-  } else ngEl.innerHTML = '';
+    recEl.innerHTML=`<div class="recent"><span class="rlab">최근</span><div class="dots">${dots}</div></div>`;
+  } else recEl.innerHTML='';
 }
 
-function renderCharts(batters, pitchers, games) {
-  if (chartLine) { chartLine.destroy(); chartLine = null; }
-  const lineWrap = document.getElementById('line-wrap');
-  if (games.length > 0) {
-    lineWrap.innerHTML = '<canvas id="chart-line" height="155"></canvas>';
-    chartLine = new Chart(document.getElementById('chart-line'), {
-      type: 'line',
-      data: {
-        labels: games.map(g => g.opp || g.date),
-        datasets: [
-          { label: '득점', data: games.map(g => g.scored ?? 0), borderColor: '#1a6fd4', backgroundColor: 'rgba(26,111,212,.1)', tension: .3, fill: true, pointRadius: 4 },
-          { label: '실점', data: games.map(g => g.allowed ?? 0), borderColor: '#e53935', backgroundColor: 'rgba(229,57,53,.07)', tension: .3, fill: true, pointRadius: 4 },
-        ]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } } },
-        scales: { x: { ticks: { font: { size: 10 }, maxRotation: 30 }, grid: { display: false } }, y: { ticks: { font: { size: 10 }, stepSize: 1 }, beginAtZero: true } }
-      }
-    });
-  } else {
-    lineWrap.innerHTML = `<div class="empty" style="margin:0"><strong>경기 기록 없음</strong>시트에 경기기록 탭을 추가해주세요</div>`;
+// ── 득점/실점 차트 ──
+function renderCharts(games) {
+  if (chartLine) { chartLine.destroy(); chartLine=null; }
+  const wrap = document.getElementById('line-wrap');
+  if (games.length===0) {
+    wrap.innerHTML=`<div class="empty" style="margin:0"><strong>경기 기록 없음</strong></div>`; return;
   }
-
-  if (chartRadar) { chartRadar.destroy(); chartRadar = null; }
-  const radarCtx = document.getElementById('chart-radar');
-  const vb = batters.filter(b => b.G >= 3), vp = pitchers.filter(p => p.IP > 0);
-  if (vb.length > 0 || vp.length > 0) {
-    const avg = (arr, fn) => arr.length ? arr.reduce((s, x) => s + fn(x), 0) / arr.length : 0;
-    const norm = (v, mn, mx) => Math.max(0, Math.min(100, (v - mn) / (mx - mn) * 100));
-    const aAVG = avg(vb, b => b.AVG ?? 0), aOBP = avg(vb, b => b.OBP ?? 0),
-          aSLG = avg(vb, b => b.SLG ?? 0);
-    const aERA  = vp.length ? avg(vp, p => p.ERA ?? 9) : 9;
-    const aWHIP = vp.length ? avg(vp, p => p.WHIP ?? 3) : 3;
-    chartRadar = new Chart(radarCtx, {
-      type: 'radar',
-      data: {
-        labels: ['타율', '출루율', '장타율', 'OPS', '방어율', 'WHIP'],
-        datasets: [{
-          label: 'AY션샤인',
-          data: [
-            norm(aAVG, .1, .4), norm(aOBP, .1, .5), norm(aSLG, .1, .6),
-            norm(aAVG + aOBP + aSLG, .3, 1.2),
-            norm(9 - aERA, 0, 9), norm(3 - aWHIP, 0, 3),
-          ],
-          borderColor: '#1a6fd4', backgroundColor: 'rgba(26,111,212,.15)',
-          pointBackgroundColor: '#1a6fd4', pointRadius: 3,
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { r: { beginAtZero: true, max: 100, ticks: { display: false }, pointLabels: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,.06)' } } }
-      }
-    });
-  }
+  wrap.innerHTML='<canvas id="chart-line" height="155"></canvas>';
+  chartLine = new Chart(document.getElementById('chart-line'),{
+    type:'line',
+    data:{
+      labels: games.map(g=>g.opp||g.date),
+      datasets:[
+        {label:'득점',data:games.map(g=>g.scored??0),borderColor:'#1a6fd4',backgroundColor:'rgba(26,111,212,.1)',tension:.3,fill:true,pointRadius:4},
+        {label:'실점',data:games.map(g=>g.allowed??0),borderColor:'#e53935',backgroundColor:'rgba(229,57,53,.07)',tension:.3,fill:true,pointRadius:4},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}}},
+      scales:{x:{ticks:{font:{size:10},maxRotation:30},grid:{display:false}},y:{ticks:{font:{size:10},stepSize:1},beginAtZero:true}}}
+  });
 }
 
+// ── 부문 리더 ──
 function renderTop3(batters, pitchers) {
-  const cats = [
-    { key: 'AVG',  label: '타율',   fmt: v => v.toFixed(3), pool: batters,  asc: false },
-    { key: 'HR',   label: '홈런',   fmt: v => Math.round(v), pool: batters, asc: false },
-    { key: 'RBI',  label: '타점',   fmt: v => Math.round(v), pool: batters, asc: false },
-    { key: 'OPS',  label: 'OPS',    fmt: v => v.toFixed(3), pool: batters,  asc: false },
-    { key: 'ERA',  label: 'ERA',    fmt: v => v.toFixed(2), pool: pitchers, asc: true  },
-    { key: 'K',    label: '탈삼진', fmt: v => Math.round(v), pool: pitchers, asc: false },
-    { key: 'IP',   label: '이닝',   fmt: v => v.toFixed(1), pool: pitchers, asc: false },
-    { key: 'WHIP', label: 'WHIP',   fmt: v => v.toFixed(2), pool: pitchers, asc: true  },
+  const cats=[
+    {key:'AVG',  label:'타율',  fmt:v=>v.toFixed(3), pool:batters,  asc:false},
+    {key:'RBI',  label:'타점',  fmt:v=>Math.round(v),pool:batters,  asc:false},
+    {key:'H',    label:'안타',  fmt:v=>Math.round(v),pool:batters,  asc:false},
+    {key:'SB',   label:'도루',  fmt:v=>Math.round(v),pool:batters,  asc:false},
+    {key:'ERA',  label:'ERA',   fmt:v=>v.toFixed(2), pool:pitchers, asc:true},
+    {key:'K',    label:'탈삼진',fmt:v=>Math.round(v),pool:pitchers, asc:false},
+    {key:'IP',   label:'이닝',  fmt:v=>v,            pool:pitchers, asc:false},
+    {key:'WHIP', label:'WHIP',  fmt:v=>v.toFixed(2), pool:pitchers, asc:true},
   ];
-  document.getElementById('top3-grid').innerHTML = cats.map(({ key, label, fmt, pool, asc }) => {
-    const sorted = [...pool].filter(p => p[key] != null && p.G >= 1).sort((a, b) => asc ? a[key] - b[key] : b[key] - a[key]).slice(0, 3);
-    const rows = sorted.map((p, i) => {
-      const cls = i === 0 ? 'g1' : i === 1 ? 'g2' : 'g3';
-      return `<div class="t3row"><div class="t3rank ${cls}">${i + 1}</div><div class="t3name">${p.name}</div><div class="t3val">${fmt(p[key])}</div></div>`;
+  document.getElementById('top3-grid').innerHTML=cats.map(({key,label,fmt,pool,asc})=>{
+    const sorted=[...pool].filter(p=>p[key]!=null).sort((a,b)=>asc?a[key]-b[key]:b[key]-a[key]).slice(0,3);
+    const rows=sorted.map((p,i)=>{
+      const cls=i===0?'g1':i===1?'g2':'g3';
+      return `<div class="t3row"><div class="t3rank ${cls}">${i+1}</div><div class="t3name">${p.name}</div><div class="t3val">${fmt(p[key])}</div></div>`;
     }).join('');
-    return `<div class="top3card"><div class="t3tit">${label}</div>${rows || '<div style="font-size:11px;color:#bbb;text-align:center;padding:8px 0">-</div>'}</div>`;
+    return `<div class="top3card"><div class="t3tit">${label}</div>${rows||'<div style="font-size:11px;color:#bbb;text-align:center;padding:8px 0">-</div>'}</div>`;
   }).join('');
 }
 
+// ── 타자 리스트 ──
 function filteredBatters(batters) {
   if (!qualOnly) return batters;
-  const maxG = batters.reduce((m, b) => Math.max(m, b.G || 0), 0);
-  const thr = Math.max(3, Math.round(maxG * .3));
-  return batters.filter(b => (b.G || 0) >= thr);
+  const maxPA = batters.reduce((m,b)=>Math.max(m,b.PA||0),0);
+  const thr = Math.max(3, Math.round(maxPA*.25));
+  return batters.filter(b=>(b.PA||0)>=thr);
 }
 
 function renderBatList(batters) {
-  const pool = filteredBatters(batters);
-  sortedB = [...pool].sort((a, b) => (parseFloat(b[bKey]) || 0) - (parseFloat(a[bKey]) || 0));
-  const max = parseFloat(sortedB[0]?.[bKey]) || 1;
-  const isInt = ['HR','RBI','SB','R'].includes(bKey);
-  const lbls = { OPS:'OPS', AVG:'타율', OBP:'출루율', SLG:'장타율', HR:'홈런', RBI:'타점', SB:'도루' };
-
-  document.getElementById('bat-list').innerHTML = sortedB.map((p, i) => {
-    const raw = parseFloat(p[bKey]) || 0;
-    const disp = isInt ? Math.round(raw) : raw.toFixed(3);
-    const pct = Math.round(raw / max * 100);
-    const rc = i === 0 ? 'g1' : i === 1 ? 'g2' : i === 2 ? 'g3' : '';
-    // 서브라인: G경기 · AB타수 H안타 · HR홈런 · RBI타점
-    const sub = `${fi(p.G)}G · ${fi(p.AB)}타수 ${fi(p.H)}안타 · HR${fi(p.HR)} · RBI${fi(p.RBI)}`;
+  const pool=filteredBatters(batters);
+  const isInt=['H','RBI','R','SB','PA'].includes(bKey);
+  sortedB=[...pool].sort((a,b)=>(parseFloat(b[bKey])||0)-(parseFloat(a[bKey])||0));
+  const max=parseFloat(sortedB[0]?.[bKey])||1;
+  const lbls={AVG:'타율',H:'안타',RBI:'타점',R:'득점',SB:'도루',PA:'타석'};
+  document.getElementById('bat-list').innerHTML=sortedB.map((p,i)=>{
+    const raw=parseFloat(p[bKey])||0;
+    const disp=isInt?Math.round(raw):raw.toFixed(3);
+    const pct=Math.round(raw/max*100);
+    const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';
+    const sub=`${fi(p.PA)}타석 ${fi(p.AB)}타수 ${fi(p.H)}안타 · 타점${fi(p.RBI)} 득점${fi(p.R)} 도루${fi(p.SB)}`;
     return `<div class="pcard" onclick="showB(${i})">
-      <div class="prank ${rc}">${i + 1}</div>
+      <div class="prank ${rc}">${i+1}</div>
       <div class="pmid">
         <div class="pname">${p.name}</div>
         <div class="psub">${sub}</div>
@@ -1233,272 +348,172 @@ function renderBatList(batters) {
       </div>
       <div class="pright"><div class="pval">${disp}</div><div class="plbl">${lbls[bKey]}</div></div>
     </div>`;
-  }).join('') || '<div class="empty" style="margin:10px"><strong>타자 데이터 없음</strong>요약 시트를 확인해주세요</div>';
+  }).join('')||'<div class="empty" style="margin:10px"><strong>타자 데이터 없음</strong></div>';
 }
 
+// ── 투수 리스트 ──
 function renderPitList(pitchers) {
-  const lb = ['ERA','WHIP'].includes(pKey);
-  sortedP = [...pitchers].sort((a, b) => {
-    const av = parseFloat(a[pKey]) ?? (lb ? 9999 : -1);
-    const bv = parseFloat(b[pKey]) ?? (lb ? 9999 : -1);
-    return lb ? av - bv : bv - av;
+  const lb=['ERA','WHIP'].includes(pKey);
+  sortedP=[...pitchers].sort((a,b)=>{
+    const av=parseFloat(a[pKey])??(lb?9999:-1);
+    const bv=parseFloat(b[pKey])??(lb?9999:-1);
+    return lb?av-bv:bv-av;
   });
-  const vals = sortedP.map(p => parseFloat(p[pKey])).filter(v => !isNaN(v) && v > 0);
-  const maxV = Math.max(...vals, 1), minV = Math.min(...vals, 0);
-  const lbls = { ERA:'ERA', WHIP:'WHIP', K_BB:'K/BB', IP:'이닝', K:'탈삼진' };
-
-  document.getElementById('pit-list').innerHTML = sortedP.map((p, i) => {
-    const raw = parseFloat(p[pKey]);
-    const disp = isNaN(raw) ? '-' : pKey === 'IP' ? raw.toFixed(1) : raw.toFixed(2);
-    const pct = isNaN(raw) ? 5 : lb ? Math.max(5, Math.round((maxV - raw) / Math.max(maxV - minV, .01) * 100)) : Math.round(raw / maxV * 100);
-    const rc = i === 0 ? 'g1' : i === 1 ? 'g2' : i === 2 ? 'g3' : '';
-    const good = lb && i < 3;
-    // 서브라인: 등판·이닝·K·승패
-    const wl = `${fi(p.W)}승 ${fi(p.L)}패${(p.SV||0)>0 ? ' '+fi(p.SV)+'세' : ''}`;
-    const sub = `${fi(p.G)}등판 · ${fd(p.IP,1)}이닝 · ${fi(p.K)}K · ${wl}`;
+  const vals=sortedP.map(p=>parseFloat(p[pKey])).filter(v=>!isNaN(v)&&v>0);
+  const maxV=Math.max(...vals,1), minV=Math.min(...vals,0);
+  const lbls={ERA:'ERA',WHIP:'WHIP',K_BB:'K/BB',IP:'이닝',K:'탈삼진'};
+  document.getElementById('pit-list').innerHTML=sortedP.map((p,i)=>{
+    const raw=parseFloat(p[pKey]);
+    const disp=isNaN(raw)?'-':pKey==='IP'?raw:raw.toFixed(2);
+    const pct=isNaN(raw)?5:lb?Math.max(5,Math.round((maxV-raw)/Math.max(maxV-minV,.01)*100)):Math.round(raw/maxV*100);
+    const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';
+    const good=lb&&i<3;
+    const wl=`${fi(p.W)}승 ${fi(p.L)}패${(p.SV||0)>0?' '+fi(p.SV)+'세':''}`;
+    const sub=`${fi(p.G)}등판 · ${p.IP}이닝 · ${fi(p.K)}K · ${wl}`;
     return `<div class="pcard" onclick="showP(${i})">
-      <div class="prank ${rc}">${i + 1}</div>
+      <div class="prank ${rc}">${i+1}</div>
       <div class="pmid">
         <div class="pname">${p.name}</div>
         <div class="psub">${sub}</div>
-        <div class="pbar"><div class="pbfill${good ? ' grn' : ''}" style="width:${pct}%"></div></div>
+        <div class="pbar"><div class="pbfill${good?' grn':''}" style="width:${pct}%"></div></div>
       </div>
-      <div class="pright"><div class="pval${good ? ' grn' : ''}">${disp}</div><div class="plbl">${lbls[pKey]}</div></div>
+      <div class="pright"><div class="pval${good?' grn':''}">${disp}</div><div class="plbl">${lbls[pKey]}</div></div>
     </div>`;
-  }).join('') || '<div class="empty" style="margin:10px"><strong>투수 데이터 없음</strong>요약 시트를 확인해주세요</div>';
+  }).join('')||'<div class="empty" style="margin:10px"><strong>투수 데이터 없음</strong></div>';
 }
 
-function renderSchedule(schedule, games) {
-  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const upcoming = [...schedule].filter(s => s.date.replace(/\D/g, '') >= today).sort((a, b) => a.date.localeCompare(b.date));
-  const past = [...games].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 15);
-  let html = '';
-  if (upcoming.length > 0) {
-    html += `<div class="seclbl2">예정</div>`;
-    html += upcoming.map(s => `
-      <div class="schedbanner">
-        <div class="sb-date">${s.date}${s.time ? ' · ' + s.time : ''}${s.league ? ' · ' + s.league : ''}</div>
-        <div class="sb-opp">vs ${s.opp}</div>
-        <div class="sb-meta">📍 ${s.venue || '-'}</div>
-      </div>`).join('');
+// ── 경기 기록 ──
+function renderSchedule(games) {
+  const past=[...games].sort((a,b)=>b.date.localeCompare(a.date));
+  if (past.length===0) {
+    document.getElementById('sch-list').innerHTML='<div class="empty" style="margin:10px"><strong>경기 기록 없음</strong></div>'; return;
   }
-  if (past.length > 0) {
-    html += `<div class="seclbl2">경기 결과</div>`;
-    html += past.map(g => {
-      const cls = /^(승|w)$/i.test(g.result) ? 'w' : /^(패|l)$/i.test(g.result) ? 'l' : 'd';
-      const resLabel = cls === 'w' ? '승' : cls === 'l' ? '패' : '무';
+  document.getElementById('sch-list').innerHTML=
+    `<div class="seclbl2">경기 결과</div>`+
+    past.map(g=>{
+      const cls=g.result==='승'?'w':g.result==='패'?'l':'d';
       return `<div class="schedbanner" style="display:flex;align-items:center;gap:12px">
         <div style="flex:1">
-          <div class="sb-date">${g.date}${g.league ? ' · ' + g.league : ''}</div>
+          <div class="sb-date">${g.date}${g.league?' · '+g.league:''}</div>
           <div class="sb-opp">vs ${g.opp}</div>
-          <div class="sb-meta">📍 ${g.venue || '-'}</div>
         </div>
         <div style="text-align:right">
-          <div class="sb-res ${cls}">${resLabel}</div>
-          <div class="sb-score">${g.scored ?? '-'} - ${g.allowed ?? '-'}</div>
+          <div class="sb-res ${cls}">${g.result}</div>
+          <div class="sb-score">${g.scored} - ${g.allowed}</div>
         </div>
       </div>`;
     }).join('');
-  }
-  if (!html) html = `<div class="empty" style="margin:10px"><strong>일정 / 경기 기록 없음</strong>시트에 경기기록 탭을 추가해주세요</div>`;
-  document.getElementById('sch-list').innerHTML = html;
 }
 
-function getCur() { return data[curLeague]; }
-
 function renderAll() {
-  const d = getCur();
-  renderOverview(d.batters, d.pitchers, d.games, d.schedule, d.summary || []);
-  renderCharts(d.batters, d.pitchers, d.games);
+  const d=data[curLeague];
+  renderOverview(d.batters, d.pitchers, d.games);
+  renderCharts(d.games);
   renderTop3(d.batters, d.pitchers);
   renderBatList(d.batters);
   renderPitList(d.pitchers);
-  renderSchedule(d.schedule, d.games);
+  renderSchedule(d.games);
 }
 
-// ══════════════════════════════════════════════
-// UI 핸들러
-// ══════════════════════════════════════════════
+// ── UI 핸들러 ──
 function switchLeague(l) {
-  curLeague = l;
-  document.querySelectorAll('.ltab').forEach((b, i) => b.classList.toggle('on', ['all','jw','ay'][i] === l));
+  curLeague=l;
+  document.querySelectorAll('.ltab').forEach((b,i)=>b.classList.toggle('on',['all','jw','ay'][i]===l));
   renderAll();
 }
 function switchFooter(t) {
-  ['bat','pit','sch'].forEach(id => {
-    document.getElementById(`ft-${id}`).classList.toggle('on', id === t);
-    document.getElementById(`sec-${id}`).style.display = id === t ? '' : 'none';
+  ['bat','pit','sch'].forEach(id=>{
+    document.getElementById(`ft-${id}`).classList.toggle('on',id===t);
+    document.getElementById(`sec-${id}`).style.display=id===t?'':'none';
   });
 }
-function sortB(key, btn) {
-  bKey = key;
-  document.querySelectorAll('#bat-sb .sbtn').forEach(b => b.classList.remove('on'));
+function sortB(key,btn) {
+  bKey=key;
+  document.querySelectorAll('#bat-sb .sbtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  renderBatList(getCur().batters);
+  renderBatList(data[curLeague].batters);
 }
-function sortP(key, btn) {
-  pKey = key;
-  document.querySelectorAll('#pit-sb .sbtn').forEach(b => b.classList.remove('on'));
+function sortP(key,btn) {
+  pKey=key;
+  document.querySelectorAll('#pit-sb .sbtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  renderPitList(getCur().pitchers);
+  renderPitList(data[curLeague].pitchers);
 }
 function toggleQual() {
-  qualOnly = !qualOnly;
-  const btn = document.getElementById('qbtn');
-  btn.classList.toggle('on', qualOnly);
-  btn.textContent = qualOnly ? '규정' : '전체';
-  renderBatList(getCur().batters);
+  qualOnly=!qualOnly;
+  const btn=document.getElementById('qbtn');
+  btn.classList.toggle('on',qualOnly);
+  btn.textContent=qualOnly?'규정':'전체';
+  renderBatList(data[curLeague].batters);
 }
 
 // ── 모달 ──
 function showB(i) {
-  const p = sortedB[i]; if (!p) return;
-  // H2/H3/HR 세부 내역
-  const hasXBH = p.H2 != null || p.H3 != null || p.HR != null;
-  const h1 = p.H != null && p.HR != null ? Math.max(0, (p.H||0)-(p.HR||0)-(p.H3||0)-(p.H2||0)) : null;
-  const xbhSection = hasXBH ? `
-    <div class="msec">안타 내역</div>
-    <div class="sg4">
-      <div class="si"><div class="siv">${fi(h1)}</div><div class="sil">1루타</div></div>
-      <div class="si"><div class="siv">${fi(p.H2)}</div><div class="sil">2루타</div></div>
-      <div class="si"><div class="siv">${fi(p.H3)}</div><div class="sil">3루타</div></div>
-      <div class="si hi"><div class="siv">${fi(p.HR)}</div><div class="sil">홈런</div></div>
-    </div>` : '';
-
-  document.getElementById('mbody').innerHTML = `
+  const p=sortedB[i]; if (!p) return;
+  document.getElementById('mbody').innerHTML=`
     <div class="drag"></div>
     <div class="mname">${p.name}</div>
-    <div class="msub">${fi(p.G)}경기 · ${fi(p.AB)}타수 ${fi(p.H)}안타</div>
-    <div class="msec">핵심 지표</div>
-    <div class="sg">
-      <div class="si hi"><div class="siv">${fd(p.OPS)}</div><div class="sil">OPS</div></div>
-      <div class="si hi"><div class="siv">${fd(p.AVG)}</div><div class="sil">타율</div></div>
-      <div class="si hi"><div class="siv">${fd(p.OBP)}</div><div class="sil">출루율</div></div>
-    </div>
+    <div class="msub">${fi(p.PA)}타석 · ${fi(p.AB)}타수 ${fi(p.H)}안타</div>
     <div class="msec">타격 기록</div>
     <div class="sg">
-      <div class="si"><div class="siv">${fi(p.RBI)}</div><div class="sil">타점</div></div>
-      <div class="si"><div class="siv">${fi(p.R)}</div><div class="sil">득점</div></div>
-      <div class="si"><div class="siv">${fi(p.SB)}</div><div class="sil">도루</div></div>
-      <div class="si"><div class="siv">${fi(p.BB)}</div><div class="sil">볼넷</div></div>
-      <div class="si"><div class="siv">${fd(p.SLG)}</div><div class="sil">장타율</div></div>
-      <div class="si"><div class="siv">${fi(p.PA)}</div><div class="sil">타석</div></div>
+      <div class="si hi"><div class="siv">${fd(p.AVG)}</div><div class="sil">타율</div></div>
+      <div class="si hi"><div class="siv">${fi(p.RBI)}</div><div class="sil">타점</div></div>
+      <div class="si hi"><div class="siv">${fi(p.R)}</div><div class="sil">득점</div></div>
     </div>
-    ${xbhSection}`;
+    <div class="sg" style="margin-top:8px">
+      <div class="si"><div class="siv">${fi(p.H)}</div><div class="sil">안타</div></div>
+      <div class="si"><div class="siv">${fi(p.SB)}</div><div class="sil">도루</div></div>
+      <div class="si"><div class="siv">${fi(p.PA)}</div><div class="sil">타석</div></div>
+    </div>`;
   openM();
 }
-
 function showP(i) {
-  const p = sortedP[i]; if (!p) return;
-  const wl = `${fi(p.W)}승 ${fi(p.L)}패${(p.SV||0)>0 ? ' '+fi(p.SV)+'세' : ''}`;
-  document.getElementById('mbody').innerHTML = `
+  const p=sortedP[i]; if (!p) return;
+  const wl=`${fi(p.W)}승 ${fi(p.L)}패${(p.SV||0)>0?' '+fi(p.SV)+'세':''}`;
+  document.getElementById('mbody').innerHTML=`
     <div class="drag"></div>
     <div class="mname">${p.name}</div>
-    <div class="msub">${fi(p.G)}등판 · ${fd(p.IP,1)}이닝 · ${wl}</div>
+    <div class="msub">${fi(p.G)}등판 · ${p.IP}이닝 · ${wl}</div>
     <div class="msec">핵심 지표</div>
     <div class="sg">
       <div class="si warn"><div class="siv">${fd(p.ERA,2)}</div><div class="sil">ERA</div></div>
       <div class="si hi"><div class="siv">${fd(p.WHIP,2)}</div><div class="sil">WHIP</div></div>
-      <div class="si hi"><div class="siv">${p.K_BB != null ? fd(p.K_BB,2) : '-'}</div><div class="sil">K/BB</div></div>
+      <div class="si hi"><div class="siv">${p.K_BB!=null?fd(p.K_BB,2):'-'}</div><div class="sil">K/BB</div></div>
     </div>
     <div class="msec">투구 기록</div>
     <div class="sg">
       <div class="si"><div class="siv">${fi(p.K)}</div><div class="sil">탈삼진</div></div>
       <div class="si"><div class="siv">${fi(p.BB)}</div><div class="sil">볼넷</div></div>
       <div class="si"><div class="siv">${fi(p.H)}</div><div class="sil">피안타</div></div>
-      <div class="si"><div class="siv">${fi(p.HR)}</div><div class="sil">피홈런</div></div>
       <div class="si"><div class="siv">${fi(p.R)}</div><div class="sil">실점</div></div>
       <div class="si grn"><div class="siv">${fi(p.ER)}</div><div class="sil">자책점</div></div>
+      <div class="si"><div class="siv">${p.IP}</div><div class="sil">이닝</div></div>
     </div>`;
   openM();
 }
+function openM(){document.getElementById('ov').classList.add('on');document.getElementById('modal').classList.add('on');}
+function closeModal(){document.getElementById('ov').classList.remove('on');document.getElementById('modal').classList.remove('on');}
 
-function openM() {
-  document.getElementById('ov').classList.add('on');
-  document.getElementById('modal').classList.add('on');
-}
-function closeModal() {
-  document.getElementById('ov').classList.remove('on');
-  document.getElementById('modal').classList.remove('on');
-}
-
-// ══════════════════════════════════════════════
-// CSV → Markdown 변환 (GitHub Pages용)
-// ══════════════════════════════════════════════
-function parseCSVLine(line) {
-  const cells = [];
-  let i = 0;
-  while (i <= line.length) {
-    if (i === line.length) { cells.push(''); break; }
-    if (line[i] === '"') {
-      let j = i + 1, cell = '';
-      while (j < line.length) {
-        if (line[j] === '"' && line[j+1] === '"') { cell += '"'; j += 2; }
-        else if (line[j] === '"') { j++; break; }
-        else { cell += line[j++]; }
-      }
-      cells.push(cell);
-      if (line[j] === ',') j++;
-      i = j;
-    } else {
-      let j = i;
-      while (j < line.length && line[j] !== ',') j++;
-      cells.push(line.slice(i, j));
-      i = j + 1;
-    }
-  }
-  return cells;
-}
-
-function csvToMarkdown(csv) {
-  const lines = csv.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
-  const out = [];
-  for (const line of lines) {
-    const cells = parseCSVLine(line);
-    const allEmpty = cells.every(c => !c);
-    if (allEmpty) { out.push(''); continue; }
-    out.push('|' + cells.join('|') + '|');
-  }
-  return out.join('\n');
-}
-
-async function fetchSheet(gid) {
-  const SID = '19Uc_jjR0trSLlsxQuqVxt9Z2Y6svE-0m34Hq_Pk5cig';
-  const url = `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`시트 로딩 실패 (gid=${gid}, status=${r.status})`);
-  return csvToMarkdown(await r.text());
-}
-
-// ══════════════════════════════════════════════
-// 데이터 로드
-// ══════════════════════════════════════════════
+// ── 데이터 로드 ──
 async function loadData() {
-  document.getElementById('bat-list').innerHTML = '<div class="loading"><div class="spin"></div><div class="ltxt">구글시트 읽는 중...</div></div>';
-  document.getElementById('kpi-grid').innerHTML = '';
-  document.getElementById('upd').textContent = '로딩 중...';
+  document.getElementById('bat-list').innerHTML='<div class="loading"><div class="spin"></div><div class="ltxt">데이터 로딩 중...</div></div>';
+  document.getElementById('kpi-grid').innerHTML='';
+  document.getElementById('upd').textContent='로딩 중...';
   try {
-    // 요약(714373386) + FY26 정왕(1716487207) + FY26 안양(45566559)
-    const [mdSummary, mdJW, mdAY] = await Promise.all([
-      fetchSheet(714373386),
-      fetchSheet(1716487207),
-      fetchSheet(45566559),
-    ]);
-    const content = [mdSummary, '', mdJW, '', mdAY].join('\n');
-    if (!content || content.length < 50) throw new Error('시트 내용이 비어있어요');
-    data = parseAll(content);
+    const r = await fetch('data.json');
+    if (!r.ok) throw new Error(`data.json 로딩 실패 (${r.status})`);
+    const json = await r.json();
+    data = buildData(json);
     const d = data.all;
-    const now = new Date();
-    document.getElementById('upd').textContent =
-      `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} · 타자 ${d.batters.length}명 · 투수 ${d.pitchers.length}명`;
+    document.getElementById('upd').textContent=
+      `${(json.updated||'').slice(5,16)} · 타자 ${d.batters.length}명 · 투수 ${d.pitchers.length}명`;
     renderAll();
   } catch(e) {
-    document.getElementById('bat-list').innerHTML =
+    document.getElementById('bat-list').innerHTML=
       `<div class="errbox">⚠️ ${e.message}<br><button class="rbtn" onclick="loadData()">다시 시도</button></div>`;
-    document.getElementById('upd').textContent = '로드 실패';
+    document.getElementById('upd').textContent='로드 실패';
   }
 }
-
 loadData();
 </script>
 </body>

@@ -215,12 +215,16 @@ function txPitcher(p) {
 }
 function buildData(json) {
   const games    = json.games    || [];
-  const batters  = (json.batters  || []).map(txBatter);
-  const pitchers = (json.pitchers || []).map(txPitcher);
+  const batters  = (json.batters      || []).map(txBatter);
+  const pitchers = (json.pitchers     || []).map(txPitcher);
+  const jwBat    = (json.jw_batters   || []).map(txBatter);
+  const jwPit    = (json.jw_pitchers  || []).map(txPitcher);
+  const ayBat    = (json.ay_batters   || []).map(txBatter);
+  const ayPit    = (json.ay_pitchers  || []).map(txPitcher);
   return {
-    all: { batters, pitchers, games },
-    jw:  { batters, pitchers, games: games.filter(g=>g.league==='정왕') },
-    ay:  { batters, pitchers, games: games.filter(g=>g.league==='안양') },
+    all: { batters,                   pitchers,                games },
+    jw:  { batters: jwBat.length ? jwBat : batters, pitchers: jwPit.length ? jwPit : pitchers, games: games.filter(g=>g.league==='정왕') },
+    ay:  { batters: ayBat.length ? ayBat : batters, pitchers: ayPit.length ? ayPit : pitchers, games: games.filter(g=>g.league==='안양') },
   };
 }
 

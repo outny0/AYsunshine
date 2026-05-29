@@ -214,17 +214,22 @@ function txPitcher(p) {
            K:p.so, BB:p.bb, H:p.h, R:p.r, ER:p.er, W:p.w, L:p.l, SV:p.s };
 }
 function buildData(json) {
-  const games    = json.games    || [];
+  const games   = json.games    || [];
+  const pastAy  = json.past_ay_games || [];
+  const jwSzns  = json.jw_seasons    || [];
   const batters  = (json.batters      || []).map(txBatter);
   const pitchers = (json.pitchers     || []).map(txPitcher);
   const jwBat    = (json.jw_batters   || []).map(txBatter);
   const jwPit    = (json.jw_pitchers  || []).map(txPitcher);
   const ayBat    = (json.ay_batters   || []).map(txBatter);
   const ayPit    = (json.ay_pitchers  || []).map(txPitcher);
+  const pastBats = json.past_batters || [];
   return {
-    all: { batters,                   pitchers,                games },
-    jw:  { batters: jwBat.length ? jwBat : batters, pitchers: jwPit.length ? jwPit : pitchers, games: games.filter(g=>g.league==='정왕') },
-    ay:  { batters: ayBat.length ? ayBat : batters, pitchers: ayPit.length ? ayPit : pitchers, games: games.filter(g=>g.league==='안양') },
+    all: { batters, pitchers, games, pastAy, jwSeasons:jwSzns, pastBats },
+    jw:  { batters:jwBat.length?jwBat:batters, pitchers:jwPit.length?jwPit:pitchers,
+           games:games.filter(g=>g.league==='정왕'), pastAy:[], jwSeasons:jwSzns, pastBats },
+    ay:  { batters:ayBat.length?ayBat:batters, pitchers:ayPit.length?ayPit:pitchers,
+           games:games.filter(g=>g.league==='안양'), pastAy, jwSeasons:[], pastBats },
   };
 }
 
@@ -387,26 +392,66 @@ function renderPitList(pitchers) {
 }
 
 // ── 경기 기록 ──
-function renderSchedule(games) {
-  const past=[...games].sort((a,b)=>b.date.localeCompare(a.date));
-  if (past.length===0) {
-    document.getElementById('sch-list').innerHTML='<div class="empty" style="margin:10px"><strong>경기 기록 없음</strong></div>'; return;
+function gameCard(g) {
+  const cls=g.result==='승'?'w':g.result==='패'?'l':'d';
+  const score=(g.scored!==null&&g.allowed!==null)?`${g.scored} - ${g.allowed}`:g.result;
+  return `<div class="schedbanner" style="display:flex;align-items:center;gap:12px">
+    <div style="flex:1">
+      <div class="sb-date">${g.date}${g.year&&g.year!=='2026'?' · '+g.year:''}${g.league?' · '+g.league:''}</div>
+      <div class="sb-opp">vs ${g.opp}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="sb-res ${cls}">${g.result}</div>
+      <div class="sb-score">${score}</div>
+    </div>
+  </div>`;
+}
+
+function renderGameLog(currentGames, pastAy, jwSeasons) {
+  let html='';
+
+  // FY26 현재 시즌
+  if (currentGames.length>0) {
+    html+='<div class="seclbl2">⚾ 2026 시즌</div>';
+    html+=[...currentGames].sort((a,b)=>b.date.localeCompare(a.date)).map(gameCard).join('');
   }
-  document.getElementById('sch-list').innerHTML=
-    `<div class="seclbl2">경기 결과</div>`+
-    past.map(g=>{
-      const cls=g.result==='승'?'w':g.result==='패'?'l':'d';
-      return `<div class="schedbanner" style="display:flex;align-items:center;gap:12px">
-        <div style="flex:1">
-          <div class="sb-date">${g.date}${g.league?' · '+g.league:''}</div>
-          <div class="sb-opp">vs ${g.opp}</div>
-        </div>
-        <div style="text-align:right">
-          <div class="sb-res ${cls}">${g.result}</div>
-          <div class="sb-score">${g.scored} - ${g.allowed}</div>
-        </div>
+
+  // 정왕 시즌 요약
+  if (jwSeasons.length>0) {
+    html+='<div class="seclbl2">📊 정왕 역대 시즌</div>';
+    html+='<div style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.05)">';
+    html+='<div style="display:grid;grid-template-columns:48px 1fr 44px 60px 28px 28px 28px;padding:8px 14px;background:#f5f7fc;font-size:10px;font-weight:700;color:var(--sub)"><span>연도</span><span>리그</span><span>경기</span><span>승률</span><span style="color:var(--green)">승</span><span>무</span><span style="color:var(--red)">패</span></div>';
+    html+=[...jwSeasons].reverse().map(s=>{
+      const pct=s.g>0?(s.w/s.g).toFixed(3):'-';
+      return `<div style="display:grid;grid-template-columns:48px 1fr 44px 60px 28px 28px 28px;padding:10px 14px;border-top:1px solid var(--border);font-size:13px;align-items:center">
+        <span style="font-weight:700">${s.year}</span>
+        <span style="font-size:10px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.league_name}</span>
+        <span>${s.g}</span>
+        <span style="color:var(--blue);font-weight:700">${pct}</span>
+        <span style="color:var(--green);font-weight:700">${s.w}</span>
+        <span style="color:var(--sub)">${s.d}</span>
+        <span style="color:var(--red);font-weight:700">${s.l}</span>
       </div>`;
     }).join('');
+    html+='</div>';
+  }
+
+  // 과거 안양 경기 (연도별)
+  if (pastAy.length>0) {
+    const byYear={};
+    pastAy.forEach(g=>{ if(!byYear[g.year])byYear[g.year]=[]; byYear[g.year].push(g); });
+    Object.keys(byYear).sort((a,b)=>parseInt(b)-parseInt(a)).forEach(yr=>{
+      const yg=[...byYear[yr]].sort((a,b)=>b.date.localeCompare(a.date));
+      const w=yg.filter(g=>g.result==='승').length;
+      const l=yg.filter(g=>g.result==='패').length;
+      const d=yg.length-w-l;
+      html+=`<div class="seclbl2">🏟 안양 ${yr} · ${w}승 ${d>0?d+'무 ':''}${l}패</div>`;
+      html+=yg.map(gameCard).join('');
+    });
+  }
+
+  if(!html) html='<div class="empty" style="margin:10px"><strong>경기 기록 없음</strong></div>';
+  document.getElementById('sch-list').innerHTML=html;
 }
 
 function renderAll() {
@@ -416,7 +461,7 @@ function renderAll() {
   renderTop3(d.batters, d.pitchers);
   renderBatList(d.batters);
   renderPitList(d.pitchers);
-  renderSchedule(d.games);
+  renderGameLog(d.games, d.pastAy||[], d.jwSeasons||[]);
 }
 
 // ── UI 핸들러 ──
@@ -454,11 +499,26 @@ function toggleQual() {
 // ── 모달 ──
 function showB(i) {
   const p=sortedB[i]; if (!p) return;
+  const d=data[curLeague];
+  const hist=(d.pastBats||[]).filter(b=>b.name===p.name)
+    .sort((a,b_)=>b_.year.localeCompare(a.year));
+  const histHtml = hist.length>0 ? `
+    <div class="msec">연도별 기록</div>
+    <div style="background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border)">
+      <div style="display:grid;grid-template-columns:60px 52px 52px 52px 40px 40px;padding:7px 12px;background:#f5f7fc;font-size:10px;font-weight:700;color:var(--sub)">
+        <span>시즌</span><span>타율</span><span>타석</span><span>안타</span><span>타점</span><span>도루</span>
+      </div>
+      ${hist.map(b=>`<div style="display:grid;grid-template-columns:60px 52px 52px 52px 40px 40px;padding:8px 12px;border-top:1px solid var(--border);font-size:13px;align-items:center">
+        <span style="font-weight:700;color:var(--blue)">${b.year}</span>
+        <span style="font-weight:600">${fd(b.avg)}</span>
+        <span>${b.pa}</span><span>${b.h}</span><span>${b.rbi}</span><span>${b.sb}</span>
+      </div>`).join('')}
+    </div>` : '';
   document.getElementById('mbody').innerHTML=`
     <div class="drag"></div>
     <div class="mname">${p.name}</div>
-    <div class="msub">${fi(p.PA)}타석 · ${fi(p.AB)}타수 ${fi(p.H)}안타</div>
-    <div class="msec">타격 기록</div>
+    <div class="msub">FY26 · ${fi(p.PA)}타석 · ${fi(p.AB)}타수 ${fi(p.H)}안타</div>
+    <div class="msec">FY26 타격 기록</div>
     <div class="sg">
       <div class="si hi"><div class="siv">${fd(p.AVG)}</div><div class="sil">타율</div></div>
       <div class="si hi"><div class="siv">${fi(p.RBI)}</div><div class="sil">타점</div></div>
@@ -468,7 +528,8 @@ function showB(i) {
       <div class="si"><div class="siv">${fi(p.H)}</div><div class="sil">안타</div></div>
       <div class="si"><div class="siv">${fi(p.SB)}</div><div class="sil">도루</div></div>
       <div class="si"><div class="siv">${fi(p.PA)}</div><div class="sil">타석</div></div>
-    </div>`;
+    </div>
+    ${histHtml}`;
   openM();
 }
 function showP(i) {

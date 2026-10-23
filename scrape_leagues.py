@@ -5,6 +5,7 @@
   python scrape_leagues.py              # 올해 시즌, 캐시된 경기는 다시 받지 않음
   python scrape_leagues.py --year 2026
   python scrape_leagues.py --refresh    # 경기 박스스코어 캐시 무시하고 전부 다시 받기
+  python scrape_leagues.py --archive 2019-2025   # 지난 시즌 → seasons/YYYY.json (최초 1회)
 """
 import sys, os, re, json, html, time, ssl, argparse
 import urllib.request, urllib.parse
@@ -36,9 +37,15 @@ def fetch(url, data=None, enc='utf-8', referer=None, ua=UA):
     req = urllib.request.Request(url, data=body, headers={'User-Agent': ua})
     if referer: req.add_header('Referer', referer)
     ctx = _ssl_legacy if 'alb.or.kr' in url else None
-    with urllib.request.urlopen(req, timeout=30, context=ctx) as r:
-        raw = r.read()
-        if not r.headers.get('Transfer-Encoding'): raw = dechunk(raw)
+    for attempt in range(3):          # 리그 서버가 가끔 응답 없음(시간 초과) → 쉬었다 재시도
+        try:
+            with urllib.request.urlopen(req, timeout=30, context=ctx) as r:
+                raw = r.read()
+                if not r.headers.get('Transfer-Encoding'): raw = dechunk(raw)
+            break
+        except OSError:
+            if attempt == 2: raise
+            time.sleep(10 * (attempt + 1))
     _last[0] = time.time()
     return raw.decode(enc, 'ignore')
 
@@ -124,7 +131,8 @@ def split_cells(cells):
     for cell in cells:
         for tok in re.split(r'[\s,]+', cell.strip()):
             if not tok or tok == '-': continue
-            if EVENT.search(tok) and pas: pas[-1] += ',' + tok
+            if EVENT.search(tok):
+                if pas: pas[-1] += ',' + tok     # 칸 맨 앞 이벤트(대주자 도루·보크 등)는 타석이 아니므로 버림
             else: pas.append(tok)
     return pas
 
@@ -274,6 +282,8 @@ def alb_box(g, refresh=False):
         return {'inn': [x for x in v[:-5] if x != ''], 'r': int(num(tail[0])), 'h': int(num(tail[1])),
                 'e': int(num(tail[2])), 'b': int(num(tail[3]))}
     ls = [lrow(r) for r in sc]
+    # 상대 기권·불참: 점수 칸에 '기권승'/'몰수승' 같은 문자, 점수는 0:0 으로 남음
+    forfeit = next((x for x in sc[me] if x in ('기권승', '기권패', '몰수승', '몰수패')), '')
 
     batters = []
     for tag, rows in tb:
@@ -281,13 +291,24 @@ def alb_box(g, refresh=False):
             for r in rows[1:]:
                 if not r[0] or not r[0].isdigit() and r[0] not in ('PH', 'PR', 'F'): continue
                 stats = r[-6:]          # 타석 타수 득점 안타 타점 통산타율
-                pas = [x for x in r[3:-6] if x not in ('-', '//', '')]
+                # '=4회콜드', '=역전' 같은 경기 종료 메모는 타석 아님
+                pas = [x for x in r[3:-6] if x not in ('-', '//', '') and not x.startswith('=')]
                 b = {'order': r[0], 'name': r[1], 'no': '', 'pos': r[2], 'pas': pas,
                      'pa': int(num(stats[0])), 'ab': int(num(stats[1])), 'r': int(num(stats[2])),
                      'h': int(num(stats[3])), 'rbi': int(num(stats[4])),
                      'sb': sum(p.count('도루') - p.count('도루실패') for p in pas)}
                 add_pa_counts(b, pas)
                 batters.append(b)
+
+    # 타자 합계 칸이 통째로 비어 있는 경기(2025-10-18 등) → 타석 결과로 타석·타수·안타 재계산 (득점·타점은 알 수 없음)
+    if batters and not any(b['pa'] for b in batters):
+        for b in batters:
+            ks = [pa_kind(p) for p in b['pas']]
+            sac = sum('희' in p for p in b['pas'])
+            b['pa'] = len(ks)
+            b['ab'] = len(ks) - ks.count('BB') - ks.count('HBP') - sac
+            b['h'] = sum(k in ('1B', '2B', '3B', 'HR') for k in ks)
+        if not ls[me]['h']: ls[me]['h'] = sum(b['h'] for b in batters)
 
     pitchers = []
     for tag, rows in tb:
@@ -326,10 +347,14 @@ def alb_box(g, refresh=False):
             'date': g['date'], 'dow': dow, 'time': g['time'],
             'opp': teams[op], 'home': me == 1,
             'scored': ls[me]['r'], 'allowed': ls[op]['r'], 'line': {'ay': ls[me], 'opp': ls[op]},
-            'batters': batters, 'pitchers': pitchers, 'pitch_complete': pitch_complete,
-            'src': url}
+            'batters': batters, 'pitchers': pitchers, 'pitch_complete': pitch_complete or bool(forfeit),
+            'forfeit': forfeit, 'src': url}
 
 # --- 집계 ---
+def result(g):
+    if g.get('forfeit'): return g['forfeit'][-1]          # '기권승' → '승'
+    return '승' if g['scored'] > g['allowed'] else ('패' if g['scored'] < g['allowed'] else '무')
+
 BAT_KEYS = ('pa', 'ab', 'h', 'd2', 'd3', 'hr', 'rbi', 'r', 'sb', 'bb', 'hbp', 'so')
 PIT_KEYS = ('outs', 'bf', 'h', 'hr', 'bb', 'hbp', 'so', 'r', 'er')
 
@@ -372,7 +397,7 @@ def agg_pitchers(games):
 def legacy_game(g):
     """기존 index.html 이 읽는 games 형식"""
     m, d = g['date'][5:7], g['date'][8:10]
-    res = '승' if g['scored'] > g['allowed'] else ('패' if g['scored'] < g['allowed'] else '무')
+    res = result(g)
     return {'date': f"{m}.{d} ({g['dow']})", 'year': g['date'][:4], 'league': g['league'], 'opp': g['opp'],
             'scored': g['scored'], 'allowed': g['allowed'], 'result': res, 'id': g['id']}
 
@@ -384,32 +409,89 @@ def legacy_pitcher(p):
             'r': p['r'], 'er': p['er'], 'era': p['era'], 'w': p['w'], 'l': p['l'], 's': p['s']}
 
 # --- 메인 ---
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--year', type=int, default=datetime.now().year)
-    ap.add_argument('--refresh', action='store_true')
-    a = ap.parse_args()
+SEASON_DIR = os.path.join(SCRIPT_DIR, 'seasons')     # 지난 시즌: seasons/YYYY.json (한 번 받아두면 끝)
 
+def scrape_year(year, refresh=False):
     games, warns = [], []
-    print(f'[정왕] {a.year} 경기 목록...')
-    for g in jw_game_list(a.year):
+    print(f'[정왕] {year} 경기 목록...')
+    for g in jw_game_list(year):
         if not g['done']: continue
-        try: games.append(jw_box(g, a.refresh)); print('  ', g['date'], 'OK')
+        try: games.append(jw_box(g, refresh)); print('  ', g['date'], 'OK')
         except Exception as e: warns.append(str(e)); print('  ', g['date'], '실패:', e)
 
-    print(f'[안양] {a.year} 경기 목록...')
-    for g in alb_game_list(a.year):
-        try: games.append(alb_box(g, a.refresh)); print('  ', g['date'], 'OK')
+    print(f'[안양] {year} 경기 목록...')
+    for g in alb_game_list(year):
+        try: games.append(alb_box(g, refresh)); print('  ', g['date'], 'OK')
         except Exception as e: warns.append(str(e)); print('  ', g['date'], '실패:', e)
 
     games.sort(key=lambda g: (g['date'], g['time']))
     for g in games:
+        g['result'] = result(g)
         for b in g['batters']:
             if len(b['pas']) > b['pa']:
                 warns.append(f"{g['date']} {g['league']} {b['name']}: 타석 {b['pa']} < 타석결과 {len(b['pas'])}개 — 파서 확인 필요 {b['pas']}")
             elif len(b['pas']) < b['pa']:
                 warns.append(f"{g['date']} {g['league']} {b['name']}: 타석 {b['pa']}인데 결과 {len(b['pas'])}개만 기록됨 (리그 원본 누락)")
         if not g['pitch_complete']: warns.append(f"{g['date']} {g['league']} vs {g['opp']}: 투수 기록 미입력(박스스코어로 일부 보정)")
+    return games, warns
+
+def season_stats(games):
+    jw = [g for g in games if g['league'] == '정왕']
+    ay = [g for g in games if g['league'] == '안양']
+    return {'all': {'batters': agg_batters(games), 'pitchers': agg_pitchers(games)},
+            'jw': {'batters': agg_batters(jw), 'pitchers': agg_pitchers(jw)},
+            'ay': {'batters': agg_batters(ay), 'pitchers': agg_pitchers(ay)}}
+
+def record(games):
+    rs = [result(g) for g in games]; w, l = rs.count('승'), rs.count('패')
+    return {'g': len(games), 'w': w, 'l': l, 'd': len(games) - w - l,
+            'rs': sum(g['scored'] for g in games), 'ra': sum(g['allowed'] for g in games)}
+
+def history(seasons):
+    """연도별 팀 성적 + 선수 연도별 기록(전 리그 합산) — 홈 드롭다운·선수 연도별 그래프용"""
+    team, bat, pit = [], [], []
+    for y, games in sorted(seasons.items()):
+        jw = [g for g in games if g['league'] == '정왕']; ay = [g for g in games if g['league'] == '안양']
+        team.append({'year': y, 'all': record(games), 'jw': record(jw), 'ay': record(ay)})
+        for b in agg_batters(games): bat.append({'year': y, **b})
+        for p in agg_pitchers(games): pit.append({'year': y, **p})
+    return {'team': team, 'batters': bat, 'pitchers': pit}
+
+def write_json(path, obj, indent=1):
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(obj, f, ensure_ascii=False, indent=indent)
+
+def load_seasons(exclude):
+    out = {}
+    if os.path.isdir(SEASON_DIR):
+        for fn in sorted(os.listdir(SEASON_DIR)):
+            m = re.fullmatch(r'(\d{4})\.json', fn)
+            if m and int(m.group(1)) != exclude:
+                with open(os.path.join(SEASON_DIR, fn), encoding='utf-8') as f:
+                    out[int(m.group(1))] = json.load(f)['box']
+    return out
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--year', type=int, default=datetime.now().year)
+    ap.add_argument('--refresh', action='store_true')
+    ap.add_argument('--archive', metavar='YYYY-YYYY', help='지난 시즌을 seasons/YYYY.json 으로 저장 (예: 2019-2025)')
+    a = ap.parse_args()
+
+    if a.archive:
+        y1, y2 = (int(x) for x in a.archive.split('-'))
+        os.makedirs(SEASON_DIR, exist_ok=True)
+        for y in range(y1, y2 + 1):
+            games, warns = scrape_year(y, a.refresh)
+            if not games: print(f'  {y}: 경기 없음'); continue
+            write_json(os.path.join(SEASON_DIR, f'{y}.json'),
+                       {'year': y, 'updated': datetime.now().strftime('%Y-%m-%d %H:%M'), 'record': record(games),
+                        'box': games, 'stats': season_stats(games), 'warnings': warns}, indent=None)
+            r = record(games)
+            print(f"→ {y}: {r['g']}경기 {r['w']}승 {r['l']}패 {r['d']}무, 경고 {len(warns)}건")
+        return
+
+    games, warns = scrape_year(a.year, a.refresh)
     jw = [g for g in games if g['league'] == '정왕']
     ay = [g for g in games if g['league'] == '안양']
 
@@ -417,7 +499,9 @@ def main():
     if os.path.exists(BASE_JSON):
         with open(BASE_JSON, encoding='utf-8') as f: base = json.load(f)
 
-    bat_all, pit_all = agg_batters(games), agg_pitchers(games)
+    st = season_stats(games)
+    bat_all, pit_all = st['all']['batters'], st['all']['pitchers']
+    past = load_seasons(a.year)
     out = {
         'updated': datetime.now().strftime('%Y-%m-%d %H:%M'),
         'season': a.year,
@@ -426,24 +510,24 @@ def main():
         'games': [legacy_game(g) for g in games],
         'batters': [legacy_batter(b) for b in bat_all],
         'pitchers': [legacy_pitcher(p) for p in pit_all],
-        'jw_batters': [legacy_batter(b) for b in agg_batters(jw)],
-        'jw_pitchers': [legacy_pitcher(p) for p in agg_pitchers(jw)],
-        'ay_batters': [legacy_batter(b) for b in agg_batters(ay)],
-        'ay_pitchers': [legacy_pitcher(p) for p in agg_pitchers(ay)],
+        'jw_batters': [legacy_batter(b) for b in st['jw']['batters']],
+        'jw_pitchers': [legacy_pitcher(p) for p in st['jw']['pitchers']],
+        'ay_batters': [legacy_batter(b) for b in st['ay']['batters']],
+        'ay_pitchers': [legacy_pitcher(p) for p in st['ay']['pitchers']],
         'past_ay_games': base.get('past_ay_games', []),
         'jw_seasons': base.get('jw_seasons', []),
         'past_batters': base.get('past_batters', []),
         # 모바일 대시보드용 확장 필드
         'box': games,
-        'stats': {'all': {'batters': bat_all, 'pitchers': pit_all},
-                  'jw': {'batters': agg_batters(jw), 'pitchers': agg_pitchers(jw)},
-                  'ay': {'batters': agg_batters(ay), 'pitchers': agg_pitchers(ay)}},
+        'stats': st,
+        'years': sorted(list(past) + [a.year], reverse=True),     # 지난 시즌 상세는 seasons/YYYY.json
+        'history': history({**past, a.year: games}),
         'warnings': warns,
     }
-    with open(OUT_PATH, 'w', encoding='utf-8') as f:
-        json.dump(out, f, ensure_ascii=False, indent=1)
-    w = sum(g['scored'] > g['allowed'] for g in games)
-    print(f'\n완료: {len(games)}경기 (정왕 {len(jw)} / 안양 {len(ay)}) {w}승 {len(games)-w}패 → {OUT_PATH}')
+    write_json(OUT_PATH, out)
+    r = record(games)
+    print(f"\n완료: {len(games)}경기 (정왕 {len(jw)} / 안양 {len(ay)}) {r['w']}승 {r['l']}패 {r['d']}무 → {OUT_PATH}")
+    print(f"   지난 시즌 {len(past)}개 연도 기록 포함: {sorted(past)}")
     for m in warns: print('  ⚠', m)
 
 if __name__ == '__main__':

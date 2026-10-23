@@ -61,6 +61,26 @@ main{padding:14px 16px 20px;display:flex;flex-direction:column;gap:14px}
 .seg.light button{color:var(--muted)}
 .seg.light button.on{background:#fff;color:var(--text)}
 
+/* 연도 선택 */
+.ysel{position:relative;flex-shrink:0}
+.ysel select{appearance:none;-webkit-appearance:none;height:38px;padding:0 32px 0 14px;border-radius:10px;border:1px solid var(--hb);background:var(--hdr2);color:var(--ht);font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.ysel::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid var(--hm);border-bottom:2px solid var(--hm);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.ysel select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.past-tag{font-size:11px;font-weight:700;color:#e3b341}
+.yt{font-size:13px}
+.yt th{background:var(--soft);color:var(--muted);font-size:11px;font-weight:500;padding:9px 6px;text-align:right;white-space:nowrap}
+.yt td{padding:9px 6px;text-align:right;border-top:1px solid var(--line);white-space:nowrap}
+.yt th:first-child,.yt td:first-child{text-align:left;padding-left:14px}
+.yt td:last-child,.yt th:last-child{padding-right:14px}
+.yt tr.cur td{font-weight:700;color:var(--accent)}
+.yt tr.tot td{font-weight:700;background:var(--soft)}
+.yrow{display:grid;grid-template-columns:44px 1fr 84px;align-items:center;gap:10px;font-size:13px;color:var(--text);min-height:36px;border:none;background:none;padding:0;font-family:inherit;text-align:left;width:100%}
+.yrow .trk{height:14px;border-radius:4px;background:var(--line);overflow:hidden;display:flex}
+.yrow .trk i{display:block;height:100%}
+.yrow.cur{font-weight:700}
+.yrow.cur span:first-child{color:var(--accent)}
+
 /* 홈 */
 .big{font-size:34px;font-weight:900;letter-spacing:-1px}
 .stat4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
@@ -176,7 +196,7 @@ const LG = { all: '통합', jw: '정왕', ay: '안양' };
 const LG_NAME = { '정왕': 'jw', '안양': 'ay' };
 let D = null;
 const S = {                      // 화면 상태 (리그 선택은 기기에 기억)
-  league: load('lg', 'all'), gFilter: 'all',
+  year: 0, league: load('lg', 'all'), gFilter: 'all',
   pTab: 'bat', pLeague: 'all', sortBat: 'avg', sortPit: 'era', boxTab: 'bat'
 };
 function load(k, d) { try { return localStorage.getItem('ay.' + k) || d; } catch (e) { return d; } }
@@ -186,11 +206,12 @@ const $app = document.getElementById('app');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const avg3 = v => (v ?? 0).toFixed(3).replace(/^0(?=\.)/, '');
 const md = d => `${+d.slice(5, 7)}.${d.slice(8, 10)}`;
-const result = g => g.scored > g.allowed ? 'W' : g.scored < g.allowed ? 'L' : 'D';
+const result = g => g.result ? { '승': 'W', '패': 'L', '무': 'D' }[g.result]
+  : g.scored > g.allowed ? 'W' : g.scored < g.allowed ? 'L' : 'D';
 const RES_KO = { W: '승', L: '패', D: '무' };
 const lgBadge = g => g.league === '정왕'
   ? `<span class="badge b-jw">정왕${g.div ? ' · ' + esc(g.div.replace('정왕', '')) : ''}</span>`
-  : `<span class="badge b-ay">안양 · ${esc(g.comp)}</span>`;
+  : `<span class="badge b-ay">안양 · ${esc(g.comp)}${g.league_season && g.league_season !== g.date.slice(0, 4) ? ` (${esc(g.league_season.slice(2))}시즌)` : ''}</span>`;
 const ICON_BACK = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>';
 
 // 타석 결과 분류 (scrape_leagues.pa_kind 와 같은 규칙)
@@ -206,8 +227,28 @@ function paKind(p) {
 }
 const chips = pas => `<div class="chips">${pas.map(p => `<span class="chip ${paKind(p)}">${esc(p.replace(/,/g, ' · '))}</span>`).join('')}</div>`;
 
-const games = lg => D.box.filter(g => lg === 'all' || LG_NAME[g.league] === lg);
-const stats = lg => D.stats[lg];
+// 시즌 데이터: 올해는 data.json, 지난 시즌은 seasons/YYYY.json 을 처음 볼 때 받아옴
+const SEA = {};
+const isCur = () => S.year === D.season;
+const cur = () => SEA[S.year];
+const games = lg => cur().box.filter(g => lg === 'all' || LG_NAME[g.league] === lg);
+const stats = lg => cur().stats[lg];
+function loadYear(y) {
+  if (SEA[y]) return Promise.resolve(SEA[y]);
+  return fetch(`seasons/${y}.json`).then(r => { if (!r.ok) throw new Error(`${y} 시즌 기록 없음 (${r.status})`); return r.json(); })
+    .then(j => (SEA[y] = j));
+}
+function setYear(y) {
+  y = +y;
+  if (!D.years.includes(y)) return;
+  loadYear(y).then(() => { S.year = y; render(); })
+    .catch(err => alertBar(err.message));
+}
+function alertBar(msg) { const m = $app.querySelector('main'); if (m) m.insertAdjacentHTML('afterbegin', `<div class="warn">${esc(msg)}</div>`); }
+const yearSel = () => `<label class="ysel"><span class="sr">시즌 선택</span>
+  <select data-act="year">${D.years.map(y => `<option value="${y}"${y === S.year ? ' selected' : ''}>${y}</option>`).join('')}</select></label>`;
+const seasonLabel = () => isCur() ? `${D.season} 시즌 · ${esc(D.updated.slice(5).replace('-', '.'))} 갱신`
+  : `<span class="past-tag">지난 시즌</span> ${S.year}`;
 
 // 규정: 타자 = 팀 경기수 × 2 타석, 투수 = 10이닝(30아웃)
 const qualPA = lg => games(lg).length * 2;
@@ -242,8 +283,9 @@ function viewHome() {
       <div class="logo">AY</div>
       <div style="flex:1;display:flex;flex-direction:column">
         <span class="title">AY션샤인</span>
-        <span class="small" style="color:var(--hm)">${D.season} 시즌 · ${esc(D.updated.slice(5).replace('-', '.'))} 갱신</span>
+        <span class="small" style="color:var(--hm)">${seasonLabel()}</span>
       </div>
+      ${yearSel()}
     </div>
     <div class="ltabs" role="tablist" aria-label="리그 선택">
       ${Object.keys(LG).map(k => `<button role="tab" class="ltab${k === lg ? ' on' : ''}" data-act="league" data-v="${k}">${LG[k]}</button>`).join('')}
@@ -254,7 +296,7 @@ function viewHome() {
       <div class="row between" style="align-items:baseline">
         <div class="row" style="align-items:baseline"><span class="big">${w}승 ${l}패</span>
           <span class="small muted">승률 ${avg3(w + l ? w / (w + l) : 0)}</span></div>
-        <span class="small muted">${gs.length}경기</span>
+        <span class="small muted">${gs.length}경기${gs.length - w - l ? ` · ${gs.length - w - l}무` : ''}</span>
       </div>
       <div class="stat4">
         <div class="stat"><b>${(rs / n).toFixed(1)}</b><span class="tiny muted">득점/경기</span></div>
@@ -269,7 +311,7 @@ function viewHome() {
     </section>
     ${last ? `
     <section class="card" aria-label="최근 경기">
-      <div class="row between"><span class="h2">최근 경기</span>${lgBadge(last)}</div>
+      <div class="row between"><span class="h2">${isCur() ? '최근 경기' : '시즌 마지막 경기'}</span>${lgBadge(last)}</div>
       <div class="vs">
         <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;font-weight:700">AY션샤인</span>
           <span class="sc" style="color:${result(last) === 'W' ? 'var(--accent)' : 'var(--text)'}">${last.scored}</span></div>
@@ -282,15 +324,31 @@ function viewHome() {
       <a class="btn" href="#/game/${last.id}">박스스코어 보기</a>
     </section>` : ''}
     <section class="card" aria-label="부문별 1위">
-      <div class="row between"><span class="h2">부문별 1위</span><a href="#/players" class="small" style="min-height:44px;display:flex;align-items:center">전체 기록</a></div>
+      <div class="row between"><span class="h2">부문별 1위${isCur() ? '' : ` <span class="small muted">${S.year}</span>`}</span><a href="#/players" class="small" style="min-height:44px;display:flex;align-items:center">전체 기록</a></div>
       <div class="leaders">
         ${lead.map(([cat, p, f]) => `<a class="leader" href="#/player/${encodeURIComponent(p.name)}">
           <span class="tiny muted">${cat}${cat === '타율' ? ` · ${q}타석+` : cat === '평균자책점' ? ' · 10이닝+' : ''}</span>
           <b>${f(p)}</b><span style="font-size:13px;font-weight:500">${esc(p.name)}</span></a>`).join('')}
       </div>
     </section>
+    ${teamHistory(lg)}
     <div class="foot">출처: 시흥시 야구소프트볼협회 · 안양시야구연합회 경기기록지</div>
   </main>`;
+}
+
+// 연도별 팀 성적 — 승(파랑)·무(연파랑)·패(회색) 막대, 누르면 그 시즌으로 이동
+function teamHistory(lg) {
+  const rows = (D.history?.team || []).map(t => ({ y: t.year, ...t[lg] })).filter(t => t.g).reverse();
+  if (rows.length < 2) return '';
+  const mx = Math.max(...rows.map(t => t.g));
+  return `<section class="card" aria-label="연도별 팀 성적">
+    <div class="row between"><span class="h2">연도별 성적</span><span class="tiny muted">${LG[lg]} · 누르면 그 시즌 보기</span></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+    ${rows.map(t => `<button class="yrow${t.y === S.year ? ' cur' : ''}" data-act="year" data-v="${t.y}">
+      <span>${t.y}</span>
+      <span class="trk" style="width:${Math.round(t.g / mx * 100)}%" aria-hidden="true"><i style="width:${t.w / t.g * 100}%;background:var(--accent)"></i><i style="width:${t.d / t.g * 100}%;background:#9cc3f2"></i></span>
+      <span style="text-align:right;white-space:nowrap">${t.w}승 ${t.l}패${t.d ? ' ' + t.d + '무' : ''}</span></button>`).join('')}
+    </div></section>`;
 }
 
 // ---------- 화면: 경기 목록 ----------
@@ -298,11 +356,12 @@ function viewGames() {
   const f = S.gFilter, gs = games(f).slice().reverse();
   const byM = {};
   gs.forEach(g => (byM[g.date.slice(0, 7)] = byM[g.date.slice(0, 7)] || []).push(g));
-  const past = pastSeasons(f);
+  const w = gs.filter(g => result(g) === 'W').length, l = gs.filter(g => result(g) === 'L').length;
   return `
   <header>
-    <div class="row between"><span class="title" style="font-size:20px">경기 기록</span>
-      <span class="small" style="color:var(--hm)">${D.season} · ${gs.length}경기</span></div>
+    <div class="row between"><div style="display:flex;flex-direction:column"><span class="title" style="font-size:20px">경기 기록</span>
+      <span class="small" style="color:var(--hm)">${isCur() ? '' : '<span class="past-tag">지난 시즌</span> '}${gs.length}경기 ${w}승 ${l}패${gs.length - w - l ? ' ' + (gs.length - w - l) + '무' : ''}</span></div>
+      ${yearSel()}</div>
     <div class="pills" role="tablist" aria-label="리그 필터">
       ${Object.keys(LG).map(k => `<button role="tab" class="pill${k === f ? ' on' : ''}" data-act="gfilter" data-v="${k}">${k === 'all' ? '전체' : LG[k]}</button>`).join('')}
     </div>
@@ -318,34 +377,12 @@ function viewGames() {
           <span class="score">${g.scored} : ${g.allowed}</span>
           <span class="res ${result(g)}">${RES_KO[result(g)]}</span></a>`).join('')}`;
     }).join('') || '<div class="empty">경기가 없습니다</div>'}
-    ${past}
   </main>`;
-}
-
-// 지난 시즌 (엑셀 시절 기록: 안양 경기별 / 정왕 시즌 요약)
-function pastSeasons(f) {
-  let out = '';
-  if (f !== 'ay' && D.jw_seasons?.length) {
-    out += `<details class="past"><summary>정왕 역대 시즌 <span class="small muted">${D.jw_seasons.length}시즌</span></summary>
-      <div class="plist">${D.jw_seasons.slice().reverse().map(s => `<div><b>${esc(s.year)}</b><span>${s.w}승 ${s.l}패${s.d ? ' ' + s.d + '무' : ''} <span class="muted small">(${s.g}경기)</span></span>
-        <span class="small muted">${s.rs}득 ${s.ra}실</span><span></span></div>`).join('')}</div></details>`;
-  }
-  if (f !== 'jw' && D.past_ay_games?.length) {
-    const yrs = [...new Set(D.past_ay_games.map(g => g.year))].filter(y => y < String(D.season)).sort().reverse();
-    out += yrs.map(y => {
-      const gs = D.past_ay_games.filter(g => g.year === y);
-      const w = gs.filter(g => g.result === '승').length;
-      return `<details class="past"><summary>안양 ${esc(y)} <span class="small muted">${w}승 ${gs.length - w}패</span></summary>
-        <div class="plist">${gs.map(g => `<div><span class="muted">${esc(g.date)}</span><span>vs ${esc(g.opp)}</span>
-          <b>${g.scored} : ${g.allowed}</b><span class="res ${g.result === '승' ? 'W' : g.result === '패' ? 'L' : 'D'}" style="width:26px;height:26px">${esc(g.result)}</span></div>`).join('')}</div></details>`;
-    }).join('');
-  }
-  return out ? `<div class="month" style="padding-top:18px"><span style="font-size:13px;font-weight:700;color:var(--sub)">지난 시즌</span></div>${out}` : '';
 }
 
 // ---------- 화면: 경기 상세 ----------
 function viewGame(id) {
-  const g = D.box.find(x => x.id === id);
+  const g = Object.values(SEA).flatMap(x => x.box).find(x => x.id === id);
   if (!g) return `<header><a class="back" href="#/games" aria-label="뒤로">${ICON_BACK}</a></header><main><div class="empty">경기를 찾을 수 없습니다</div></main>`;
   const r = result(g);
   const ninn = Math.max(g.line.ay.inn.length, g.line.opp.inn.length);
@@ -405,7 +442,7 @@ function viewGame(id) {
       <button role="tab" class="${S.boxTab === 'bat' ? 'on' : ''}" data-act="boxtab" data-v="bat">타자</button>
       <button role="tab" class="${S.boxTab === 'pit' ? 'on' : ''}" data-act="boxtab" data-v="pit">투수</button>
     </div>
-    ${S.boxTab === 'bat' ? bat : pit}
+    ${g.forfeit ? `<div class="note">${esc(g.forfeit)} — 경기가 열리지 않아 개인 기록이 없습니다.</div>` : S.boxTab === 'bat' ? bat : pit}
     <div class="foot">출처: <a href="${esc(g.src)}" target="_blank" rel="noopener">${g.league === '정왕' ? '시흥시 야구소프트볼협회' : '안양시야구연합회'} 경기기록</a></div>
   </main>`;
 }
@@ -436,8 +473,9 @@ function viewPlayers() {
   const onCol = k => k === key || (k === 'ip' && key === 'ip');
   return `
   <header>
-    <div class="row between"><span class="title" style="font-size:20px">선수 기록</span>
-      <span class="small" style="color:var(--hm)">${D.season} · ${LG[lg]}</span></div>
+    <div class="row between"><div style="display:flex;flex-direction:column"><span class="title" style="font-size:20px">선수 기록</span>
+      <span class="small" style="color:var(--hm)">${isCur() ? '' : '<span class="past-tag">지난 시즌</span> '}${S.year} · ${LG[lg]}</span></div>
+      ${yearSel()}</div>
     <div class="seg" role="tablist" aria-label="타자 투수">
       <button role="tab" class="${isBat ? 'on' : ''}" data-act="ptab" data-v="bat">타자</button>
       <button role="tab" class="${isBat ? '' : 'on'}" data-act="ptab" data-v="pit">투수</button>
@@ -463,31 +501,56 @@ function viewPlayers() {
 }
 
 // ---------- 화면: 선수 상세 ----------
+// 통산 합계 (연도별 행을 더해 비율 재계산)
+function careerBat(rows) {
+  const t = rows.reduce((a, r) => { ['g', 'pa', 'ab', 'h', 'd2', 'd3', 'hr', 'rbi', 'r', 'sb', 'bb', 'hbp', 'so'].forEach(k => a[k] = (a[k] || 0) + r[k]); return a; }, {});
+  const den = t.ab + t.bb + t.hbp, tb = t.h + t.d2 + 2 * t.d3 + 3 * t.hr;
+  t.avg = t.ab ? t.h / t.ab : 0; t.obp = den ? (t.h + t.bb + t.hbp) / den : 0; t.slg = t.ab ? tb / t.ab : 0; t.ops = t.obp + t.slg;
+  return t;
+}
+function careerPit(rows) {
+  const t = rows.reduce((a, r) => { ['g', 'w', 'l', 's', 'outs', 'h', 'bb', 'hbp', 'so', 'r', 'er'].forEach(k => a[k] = (a[k] || 0) + r[k]); return a; }, {});
+  const ip = t.outs / 3;
+  t.era = ip ? t.er * 7 / ip : 0; t.whip = ip ? (t.h + t.bb + t.hbp) / ip : 0;
+  return t;
+}
+// 연도별 막대그래프. lowGood: ERA처럼 낮을수록 좋은 값 → 최저값 막대 강조
+function yearBars(rows, val, fmt, lowGood) {
+  const max = Math.max(...rows.map(val), lowGood ? 1 : 0.5);
+  const best = lowGood ? Math.min(...rows.map(val)) : Math.max(...rows.map(val));
+  const cols = `grid-template-columns:repeat(${rows.length},1fr)`;
+  return `<div class="bars" style="${cols}">${rows.map(x => `<div class="${x.year === S.year ? 'cur' : ''}"><b>${fmt(val(x))}</b>
+      <i style="height:${Math.max(3, Math.round(val(x) / max * 110))}px${val(x) === best && x.year !== S.year ? ';background:#8fb3dd' : ''}"></i></div>`).join('')}</div>
+    <div class="blab" style="${cols}">${rows.map(x => `<button data-act="year" data-v="${x.year}" style="border:none;background:none;font:inherit;color:inherit;padding:4px 0;min-height:32px">${x.year}</button>`).join('')}</div>`;
+}
+const ipStr = o => `${Math.floor(o / 3)}.${o % 3}`;
+
 function viewPlayer(name) {
-  const b = D.stats.all.batters.find(x => x.name === name);
-  const p = D.stats.all.pitchers.find(x => x.name === name);
-  const log = D.box.filter(g => g.batters.some(x => x.name === name) || g.pitchers.some(x => x.name === name)).slice().reverse();
-  const no = (D.box.flatMap(g => g.batters).find(x => x.name === name && x.no) || {}).no || '';
-  const pos = (D.box.flatMap(g => g.batters).filter(x => x.name === name).map(x => x.pos).reduce((m, v) => (m[v] = (m[v] || 0) + 1, m), {}));
+  const st = cur().stats.all, box = cur().box;
+  const b = st.batters.find(x => x.name === name);
+  const p = st.pitchers.find(x => x.name === name);
+  const hb = (D.history?.batters || []).filter(x => x.name === name);
+  const hp = (D.history?.pitchers || []).filter(x => x.name === name && x.outs > 0);
+  const log = box.filter(g => g.batters.some(x => x.name === name) || g.pitchers.some(x => x.name === name)).slice().reverse();
+  const allBox = Object.values(SEA).flatMap(x => x.box);
+  const no = (allBox.flatMap(g => g.batters).find(x => x.name === name && x.no) || {}).no || '';
+  const pos = (box.flatMap(g => g.batters).filter(x => x.name === name).map(x => x.pos).reduce((m, v) => (m[v] = (m[v] || 0) + 1, m), {}));
   const mainPos = Object.entries(pos).sort((a, c) => c[1] - a[1])[0]?.[0] || '';
-  // 연도별 타율: 엑셀 시절 기록(FY22~) + 올해
-  const yrs = (D.past_batters || []).filter(x => x.name === name).map(x => ({ y: '20' + x.year.slice(2), avg: x.avg }))
-    .filter(x => x.y < String(D.season)).sort((a, c) => a.y.localeCompare(c.y));
-  if (b) yrs.push({ y: String(D.season), avg: b.avg, cur: 1 });
-  const max = Math.max(0.5, ...yrs.map(x => x.avg));
-  const cols = `grid-template-columns:repeat(${Math.max(yrs.length, 1)},1fr)`;
-  const ip = o => `${Math.floor(o / 3)}.${o % 3}`;
+  const yrs = [...new Set([...hb, ...hp].map(x => x.year))].sort();
+  const cb = hb.length ? careerBat(hb) : null, cp = hp.length ? careerPit(hp) : null;
   return `
   <header style="padding-top:calc(8px + env(safe-area-inset-top))">
-    <a class="back" href="javascript:history.back()" aria-label="뒤로">${ICON_BACK}</a>
+    <div class="row between"><a class="back" href="javascript:history.back()" aria-label="뒤로">${ICON_BACK}</a>${yearSel()}</div>
     <div class="row" style="gap:14px;padding-left:4px">
       <div class="pno">${esc(no) || '—'}</div>
       <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:22px;font-weight:700">${esc(name)}</span>
-        <span class="small" style="color:var(--hm)">${esc(mainPos)}${mainPos ? ' · ' : ''}${D.season} ${log.length}경기</span></div>
+        <span class="small" style="color:var(--hm)">${esc(mainPos)}${mainPos ? ' · ' : ''}${isCur() ? '' : '<span class="past-tag">지난 시즌</span> '}${S.year} ${log.length}경기${yrs.length > 1 ? ` · 통산 ${yrs.length}시즌 (${yrs[0]}~)` : ''}</span></div>
     </div>
   </header>
   <main>
+    ${!b && !p ? `<div class="note">${S.year} 시즌 기록이 없습니다. 위 연도 선택이나 아래 연도별 기록에서 다른 시즌을 골라 보세요.</div>` : ''}
     ${b ? `<section class="card" aria-label="타격 기록">
+      <div class="row between"><span class="h2">타격</span><span class="tiny muted">${S.year}</span></div>
       <div class="slash">
         <div><b style="color:var(--accent)">${avg3(b.avg)}</b><span class="tiny muted">타율</span></div>
         <div><b>${avg3(b.obp)}</b><span class="tiny muted">출루율</span></div>
@@ -498,27 +561,43 @@ function viewPlayer(name) {
         .map(([k, v]) => `<div class="stat"><b style="font-size:15px">${v}</b><span class="tiny muted">${k}</span></div>`).join('')}</div>
     </section>` : ''}
     ${p ? `<section class="card" aria-label="투구 기록">
-      <span class="h2">투구</span>
-      <div class="cnt">${[['ERA', p.era.toFixed(2)], ['승-패', `${p.w}-${p.l}`], ['이닝', ip(p.outs)], ['삼진', p.so], ['피안타', p.h], ['4사구', p.bb + p.hbp], ['실점', p.r], ['WHIP', p.whip.toFixed(2)]]
+      <div class="row between"><span class="h2">투구</span><span class="tiny muted">${S.year}</span></div>
+      <div class="cnt">${[['ERA', p.era.toFixed(2)], ['승-패', `${p.w}-${p.l}`], ['이닝', ipStr(p.outs)], ['삼진', p.so], ['피안타', p.h], ['4사구', p.bb + p.hbp], ['실점', p.r], ['WHIP', p.whip.toFixed(2)]]
         .map(([k, v]) => `<div class="stat"><b style="font-size:15px">${v}</b><span class="tiny muted">${k}</span></div>`).join('')}</div>
     </section>` : ''}
-    ${yrs.length > 1 ? `<section class="card" aria-label="연도별 타율">
-      <span class="h2">연도별 타율</span>
-      <div class="bars" style="${cols}">${yrs.map(x => `<div class="${x.cur ? 'cur' : ''}"><b>${avg3(x.avg)}</b><i style="height:${Math.round(x.avg / max * 110)}px"></i></div>`).join('')}</div>
-      <div class="blab" style="${cols}">${yrs.map(x => `<span>${x.y}</span>`).join('')}</div>
+    ${hb.length > 1 ? `<section class="card" aria-label="연도별 타율">
+      <div class="row between"><span class="h2">연도별 타율</span><span class="tiny muted">연도를 누르면 그 시즌</span></div>
+      ${yearBars(hb, x => x.avg, avg3)}
     </section>` : ''}
-    <section class="card flush" aria-label="경기별 기록">
-      <span class="h2" style="padding:16px 16px 6px">경기별 기록</span>
+    ${hp.length > 1 ? `<section class="card" aria-label="연도별 평균자책점">
+      <div class="row between"><span class="h2">연도별 평균자책점</span><span class="tiny muted">낮을수록 좋음 · 7이닝 기준</span></div>
+      ${yearBars(hp, x => x.era, v => v.toFixed(2), true)}
+    </section>` : ''}
+    ${hb.length ? `<section class="card flush scroll" aria-label="연도별 타격 기록">
+      <span class="h2" style="padding:16px 16px 10px">연도별 타격</span>
+      <table class="yt"><thead><tr><th scope="col">연도</th><th scope="col">경기</th><th scope="col">타석</th><th scope="col">타율</th><th scope="col">홈런</th><th scope="col">타점</th><th scope="col">도루</th><th scope="col">OPS</th></tr></thead>
+      <tbody>${hb.slice().reverse().map(x => `<tr class="${x.year === S.year ? 'cur' : ''}"><td>${x.year}</td><td>${x.g}</td><td>${x.pa}</td><td>${avg3(x.avg)}</td><td>${x.hr}</td><td>${x.rbi}</td><td>${x.sb}</td><td>${avg3(x.ops)}</td></tr>`).join('')}
+        ${hb.length > 1 ? `<tr class="tot"><td>통산</td><td>${cb.g}</td><td>${cb.pa}</td><td>${avg3(cb.avg)}</td><td>${cb.hr}</td><td>${cb.rbi}</td><td>${cb.sb}</td><td>${avg3(cb.ops)}</td></tr>` : ''}</tbody></table>
+    </section>` : ''}
+    ${hp.length ? `<section class="card flush scroll" aria-label="연도별 투구 기록">
+      <span class="h2" style="padding:16px 16px 10px">연도별 투구</span>
+      <table class="yt"><thead><tr><th scope="col">연도</th><th scope="col">경기</th><th scope="col">승-패</th><th scope="col">이닝</th><th scope="col">삼진</th><th scope="col">ERA</th><th scope="col">WHIP</th></tr></thead>
+      <tbody>${hp.slice().reverse().map(x => `<tr class="${x.year === S.year ? 'cur' : ''}"><td>${x.year}</td><td>${x.g}</td><td>${x.w}-${x.l}</td><td>${ipStr(x.outs)}</td><td>${x.so}</td><td>${x.era.toFixed(2)}</td><td>${x.whip.toFixed(2)}</td></tr>`).join('')}
+        ${hp.length > 1 ? `<tr class="tot"><td>통산</td><td>${cp.g}</td><td>${cp.w}-${cp.l}</td><td>${ipStr(cp.outs)}</td><td>${cp.so}</td><td>${cp.era.toFixed(2)}</td><td>${cp.whip.toFixed(2)}</td></tr>` : ''}</tbody></table>
+    </section>
+    <span class="foot">안양 리그는 투구 세부 기록(자책·삼진)이 빠진 경기가 있어 해당 연도 ERA가 실제보다 낮게 나올 수 있습니다.</span>` : ''}
+    ${log.length ? `<section class="card flush" aria-label="경기별 기록">
+      <span class="h2" style="padding:16px 16px 6px">${S.year} 경기별 기록</span>
       ${log.map(g => {
         const bt = g.batters.find(x => x.name === name), pt = g.pitchers.find(x => x.name === name);
         const ln = bt ? `${bt.ab}타수 ${bt.h}안타${bt.rbi ? ' ' + bt.rbi + '타점' : ''}` : '';
-        const pl = pt ? `${ip(pt.outs)}이닝 ${pt.r}실점${pt.dec ? ' ' + esc(pt.dec) : ''}` : '';
+        const pl = pt ? `${ipStr(pt.outs)}이닝 ${pt.r}실점${pt.dec ? ' ' + esc(pt.dec) : ''}` : '';
         return `<a class="glog" href="#/game/${g.id}">
           <div class="row"><b style="font-size:13px">${md(g.date)}</b>${lgBadge(g)}<span class="small" style="color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">vs ${esc(g.opp)}</span>
             <span style="margin-left:auto;font-size:13px;font-weight:700;white-space:nowrap">${[ln, pl].filter(Boolean).join(' · ')}</span></div>
           ${bt ? chips(bt.pas) : ''}</a>`;
-      }).join('') || '<div class="empty">기록 없음</div>'}
-    </section>
+      }).join('')}
+    </section>` : ''}
   </main>`;
 }
 
@@ -529,7 +608,15 @@ function render() {
   const [page, arg] = [h.split('/')[0], h.split('/').slice(1).join('/')];
   let html, tab;
   if (page === 'games') { html = viewGames(); tab = 'games'; }
-  else if (page === 'game') { html = viewGame(arg); tab = 'games'; }
+  else if (page === 'game') {
+    // 지난 시즌 경기 주소로 바로 들어온 경우: 아직 안 받은 시즌을 모두 받아서 다시 그림
+    if (!Object.values(SEA).some(x => x.box.some(g => g.id === arg)) && D.years.some(y => !SEA[y])) {
+      $app.innerHTML = '<div class="empty">불러오는 중…</div>';
+      Promise.all(D.years.map(y => loadYear(y).catch(() => null))).then(render);
+      return;
+    }
+    html = viewGame(arg); tab = 'games';
+  }
   else if (page === 'players') { html = viewPlayers(); tab = 'players'; }
   else if (page === 'player') { html = viewPlayer(arg); tab = 'players'; }
   else { html = viewHome(); tab = 'home'; }
@@ -543,6 +630,7 @@ $app.addEventListener('click', e => {
   const t = e.target.closest('[data-act]');
   if (!t) return;
   const v = t.dataset.v;
+  if (t.dataset.act === 'year') { if (v) setYear(v); return; }   // 드롭다운(select)은 change 에서 처리
   switch (t.dataset.act) {
     case 'league': S.league = v; save('lg', v); break;
     case 'gfilter': S.gFilter = v; break;
@@ -554,11 +642,16 @@ $app.addEventListener('click', e => {
   render();
 });
 
+$app.addEventListener('change', e => { if (e.target.dataset.act === 'year') setYear(e.target.value); });
+
 fetch('data.json?t=' + Date.now())
   .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then(j => {
     if (!j.box || !j.stats) throw new Error('data.json 형식이 옛 버전입니다 (scrape_leagues.py 로 다시 생성 필요)');
     D = j; if (!LG[S.league]) S.league = 'all';
+    D.years = D.years || [D.season];
+    SEA[D.season] = { box: D.box, stats: D.stats };
+    S.year = D.season;
     render();
   })
   .catch(err => { $app.innerHTML = `<div class="empty">데이터를 불러오지 못했습니다<br><span class="small">${esc(err.message)}</span></div>`; });

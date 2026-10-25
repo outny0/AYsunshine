@@ -1,0 +1,52 @@
+# AY션샤인 대시보드 자동 갱신 — 두 리그 사이트 수집 → 검증 → data.json 커밋 (GitHub Pages 자동 재배포)
+name: update-data
+
+on:
+  schedule:
+    - cron: '0 18 * * 0'   # 매주 월요일 03:00 KST (주말 경기 기록이 올라온 뒤)
+    - cron: '0 12 * * 3'   # 매주 수요일 21:00 KST (늦게 입력된 기록 반영)
+  workflow_dispatch:       # Actions 탭에서 수동 실행
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 종료된 경기 페이지 캐시 — 리그 서버에 같은 페이지를 다시 요청하지 않음
+      - uses: actions/cache@v4
+        with:
+          path: cache
+          key: league-cache-${{ github.run_id }}
+          restore-keys: league-cache-
+
+      - name: Scrape
+        env:
+          PYTHONIOENCODING: utf-8
+          TZ: Asia/Seoul
+        run: python scrape_leagues.py
+
+      - name: Validate
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python validate_scrape.py
+
+      - name: Commit data.json
+        run: |
+          cp data_scraped.json data.json
+          # 'updated' 시각만 바뀐 경우는 커밋하지 않음
+          if git diff --quiet -I '"updated"' -- data.json; then
+            echo "변경 없음"; exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898583+github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git commit -m "data: 리그 기록 자동 갱신 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+          git push

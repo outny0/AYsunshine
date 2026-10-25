@@ -80,9 +80,13 @@ def main():
                       ('g', 'w', 'l', 'outs', 'h', 'r', 'er', 'so'))
 
     ay = [g for g in box if g['league'] == '안양' and g['comp'] == '연합회장기' and g.get('league_season') == str(year)]
-    mine = {b['name']: b for b in S.agg_batters(ay)}
-    bad += diff_table(f'안양 타자: 연합회장기 경기별 합산 vs 사이트 시즌 누적 ({len(ay)}경기)', mine, alb_site(year),
-                      ('g', 'pa', 'ab', 'h', 'd2', 'd3', 'hr', 'rbi', 'r', 'bb', 'hbp', 'so'))
+    if not d.get('ay_live', True):
+        # 안양 사이트에 못 닿아(해외 서버 등) 지난 수집분을 그대로 쓴 경우 — 이미 검증 거친 값이라 대조 생략
+        print(f"\n=== 안양: 이번엔 못 받음 — {d.get('ay_updated')} 수집분 그대로, 대조 생략 ===")
+    else:
+        mine = {b['name']: b for b in S.agg_batters(ay)}
+        bad += diff_table(f'안양 타자: 연합회장기 경기별 합산 vs 사이트 시즌 누적 ({len(ay)}경기)', mine, alb_site(year),
+                          ('g', 'pa', 'ab', 'h', 'd2', 'd3', 'hr', 'rbi', 'r', 'bb', 'hbp', 'so'))
 
     # --- 기존 엑셀과 경기 결과 비교 (data.json 은 업데이트 후 스크랩 결과로 바뀌므로 엑셀 시절 백업 사용) ---
     ref = 'data_엑셀백업.json' if os.path.exists(os.path.join(SCRIPT_DIR, 'data_엑셀백업.json')) else 'data.json'

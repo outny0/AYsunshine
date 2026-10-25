@@ -97,6 +97,18 @@ main{padding:14px 16px 20px;display:flex;flex-direction:column;gap:14px}
 .leader{background:var(--soft);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:3px;color:var(--text)}
 .leader b{font-size:22px;font-weight:900;color:var(--accent)}
 
+/* 예정 경기 */
+.dday{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--accent);color:#fff;white-space:nowrap}
+.dday.far{background:var(--soft);color:var(--accent-dk);border:1px solid var(--border)}
+.nx{display:flex;flex-direction:column;gap:2px}
+.nx .opp{font-size:22px;font-weight:900;letter-spacing:-.5px}
+.nx-meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--sub)}
+.uplist{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.uplist div{display:grid;grid-template-columns:auto 1fr auto;white-space:nowrap;gap:8px;padding:10px 0 0;font-size:13px;align-items:center}
+.game.up{grid-template-columns:44px 1fr auto;border-style:dashed}
+.game.up .when{font-size:13px;font-weight:700;color:var(--accent-dk);text-align:right;white-space:nowrap}
+.cancel{text-decoration:line-through;color:var(--muted)}
+
 /* 경기 목록 */
 .month{display:flex;justify-content:space-between;align-items:baseline;padding:8px 4px 0}
 .game{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:44px 1fr auto 30px;align-items:center;gap:10px;color:var(--text)}
@@ -250,6 +262,31 @@ const yearSel = () => `<label class="ysel"><span class="sr">시즌 선택</span>
 const seasonLabel = () => isCur() ? `${D.season} 시즌 · ${esc(D.updated.slice(5).replace('-', '.'))} 갱신`
   : `<span class="past-tag">지난 시즌</span> ${S.year}`;
 
+// 예정 경기 — data.json upcoming (수집 시점 기준이라, 화면에서 오늘 이전 경기는 한 번 더 거른다)
+const todayStr = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; };
+const upcoming = lg => isCur() ? (D.upcoming || []).filter(g => g.date >= todayStr() && (lg === 'all' || LG_NAME[g.league] === lg)) : [];
+function dday(date) {
+  const n = Math.round((new Date(date + 'T00:00:00') - new Date(todayStr() + 'T00:00:00')) / 864e5);
+  return n === 0 ? '오늘' : n === 1 ? '내일' : `D-${n}`;
+}
+const upBadge = g => g.league === '정왕'
+  ? `<span class="badge b-jw">정왕${g.div ? ' · ' + esc(g.div.replace('정왕', '')) : ''}</span>`
+  : `<span class="badge b-ay">안양${g.kind ? ' · ' + esc(g.kind) : ''}</span>`;
+function nextCard(lg) {
+  const up = upcoming(lg);
+  if (!up.length) return '';
+  const g = up[0], dd = dday(g.date), cancel = g.status ? ' cancel' : '';
+  return `<section class="card" aria-label="다음 경기">
+    <div class="row between"><span class="h2">다음 경기</span>
+      <span class="row">${upBadge(g)}<span class="dday${dd.startsWith('D-') && +dd.slice(2) > 7 ? ' far' : ''}">${g.status ? esc(g.status) : dd}</span></span></div>
+    <div class="nx${cancel}"><span class="small muted">AY션샤인 vs</span><span class="opp">${esc(g.opp)}</span></div>
+    <div class="nx-meta"><span>${md(g.date)} (${esc(g.dow)}) ${esc(g.time)}</span>${g.place ? `<span>${esc(g.place)}${g.league === '안양' && g.place === '석수' ? ' 야구장' : ''}</span>` : ''}</div>
+    ${up.length > 1 ? `<div class="uplist">${up.slice(1, 4).map(u => `<div>
+      <span class="muted">${md(u.date)} (${esc(u.dow)})</span>
+      <span${u.status ? ' class="cancel"' : ''}>vs ${esc(u.opp)} <span class="tiny muted">${esc(u.time)}</span></span>${upBadge(u)}</div>`).join('')}</div>` : ''}
+  </section>`;
+}
+
 // 규정: 타자 = 팀 경기수 × 2 타석, 투수 = 10이닝(30아웃)
 const qualPA = lg => games(lg).length * 2;
 const QUAL_OUTS = 30;
@@ -292,6 +329,7 @@ function viewHome() {
     </div>
   </header>
   <main>
+    ${nextCard(lg)}
     <section class="card" aria-label="시즌 성적">
       <div class="row between" style="align-items:baseline">
         <div class="row" style="align-items:baseline"><span class="big">${w}승 ${l}패</span>
@@ -367,6 +405,13 @@ function viewGames() {
     </div>
   </header>
   <main style="gap:8px">
+    ${(up => up.length ? `<div class="month"><span style="font-size:13px;font-weight:700;color:var(--accent-dk)">예정</span>
+        <span class="small muted">${up.length}경기</span></div>
+      ${up.map(g => `<div class="game up">
+        <div class="d"><b>${g.date.slice(8)}</b><span class="tiny muted">${+g.date.slice(5, 7)}월 ${esc(g.dow)}</span></div>
+        <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><span class="opp${g.status ? ' cancel' : ''}">vs ${esc(g.opp)}</span>
+          <span class="row">${upBadge(g)}<span class="tiny muted">${esc(g.time)}${g.place ? ' · ' + esc(g.place) : ''}</span></span></div>
+        <span class="when">${g.status ? esc(g.status) : dday(g.date)}</span></div>`).join('')}` : '')(upcoming(f))}
     ${Object.keys(byM).map(m => {
       const ms = byM[m], w = ms.filter(g => result(g) === 'W').length, l = ms.filter(g => result(g) === 'L').length;
       return `<div class="month"><span style="font-size:13px;font-weight:700;color:var(--sub)">${+m.slice(5)}월</span>

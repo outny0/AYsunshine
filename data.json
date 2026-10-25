@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-23 15:27",
+ "updated": "2026-10-25 21:13",
  "season": 2026,
  "source": "scrape",
  "games": [
@@ -8470,6 +8470,34 @@
    "forfeit": "",
    "src": "https://www.alb.or.kr/z/view.php?id=game&no=10427",
    "result": "승"
+  }
+ ],
+ "upcoming": [
+  {
+   "league": "안양",
+   "date": "2026-10-31",
+   "dow": "토",
+   "time": "11:30",
+   "place": "석수",
+   "opp": "스나이더",
+   "home": false,
+   "comp": "",
+   "div": "",
+   "kind": "리그",
+   "status": ""
+  },
+  {
+   "league": "안양",
+   "date": "2026-11-21",
+   "dow": "토",
+   "time": "12:00",
+   "place": "석수",
+   "opp": "현대그리핀스",
+   "home": false,
+   "comp": "",
+   "div": "",
+   "kind": "리그",
+   "status": ""
   }
  ],
  "stats": {

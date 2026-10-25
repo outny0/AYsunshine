@@ -169,8 +169,24 @@ def jw_game_list(year):
         games.append({'seq': seq, 'done': '경기종료' in row,
                       'date': f'{year}-{dm.group(1)}-{dm.group(2)}' if dm else '',
                       'dow': dm.group(3) if dm else '', 'time': dm.group(4) if dm else '',
-                      'comp': lg.group(1) if lg else '', 'div': lg.group(2) if lg else ''})
+                      'comp': lg.group(1) if lg else '', 'div': lg.group(2) if lg else '', 'row': row})
     return games
+
+def jw_upcoming(year, today):
+    """정왕 일정 중 아직 안 끝난 경기. 행: '10.31 (토) 14:00 정왕주말리그 / 정왕토요4부 정왕야구장 AY션샤인 VS 상대 …'"""
+    out = []
+    for g in jw_game_list(year):
+        if g['done'] or not g['date'] or g['date'] < today: continue
+        m = re.search(r'/\s+\S+\s+(\S+)\s+(.+?)\s+VS\s+(.+?)(?:\s+(?:경기|우천|취소|연기|라인업|하이라이트)|$)', g['row'])
+        if not m: continue
+        clean = lambda s: re.sub(r'(?:^|\s)(?:콜드승|\d+)(?=\s|$)', ' ', s).strip()   # 점수·콜드 표시만 (팀명 속 숫자는 둔다)
+        t1, t2 = clean(m.group(2)), clean(m.group(3))
+        if TEAM not in (t1, t2): continue
+        status = next((k for k in ('우천취소', '취소', '연기') if k in g['row']), '')
+        out.append({'league': '정왕', 'date': g['date'], 'dow': g['dow'], 'time': g['time'],
+                    'place': m.group(1), 'opp': t2 if t1 == TEAM else t1, 'home': t2 == TEAM,
+                    'comp': g['comp'], 'div': g['div'], 'kind': '리그', 'status': status})
+    return out
 
 def jw_box(g, refresh=False):
     """PC 경기기록 페이지. 표 구성: scorebox / tb-info / player-score-box(장타·도루) / 타자×2 / 투수×2"""
@@ -265,6 +281,39 @@ def alb_game_list(year):
     return games
 
 DOW = '월화수목금토일'
+ALB_PLACE = {'석': '석수'}
+ALB_KIND = {'리': '리그', '토': '토너먼트', '플': '플레이오프', '기': '기타'}
+def alb_upcoming(today):
+    """전체 경기일정(s3.php) — 어제부터 앞으로의 경기. 행: ['10/31/11:30(석)', 1루팀, 3루팀, 비고(리/토/플/기)]
+    연도가 없어서 오늘 기준으로 붙인다(지금이 11월인데 1월 경기면 내년)"""
+    t = fetch(ALB_HOST + '/s/schedule/s3.php?gyear=&limit=300', enc='cp949')
+    ty, tm = int(today[:4]), int(today[5:7])
+    out = []
+    for tag, rows in tables(t):
+        for r in rows:
+            if len(r) < 3 or TEAM not in r[1:3]: continue
+            m = re.match(r'(\d{1,2})/(\d{1,2})/(\d{2}:\d{2})\(\s*(.*?)\s*\)', r[0])
+            if not m: continue
+            mo, d = int(m.group(1)), int(m.group(2))
+            y = ty + 1 if mo < tm - 6 else ty
+            date = f'{y}-{mo:02d}-{d:02d}'
+            if date < today: continue
+            opp = r[2] if r[1] == TEAM else r[1]
+            out.append({'league': '안양', 'date': date, 'dow': DOW[datetime(y, mo, d).weekday()], 'time': m.group(3),
+                        'place': ALB_PLACE.get(m.group(4), m.group(4)), 'opp': opp, 'home': r[1] == TEAM,
+                        'comp': '', 'div': '', 'kind': ALB_KIND.get(r[3] if len(r) > 3 else '', ''), 'status': ''})
+    return out
+
+def upcoming(year):
+    """두 리그 예정 경기 (날짜·시간순). 한쪽이 실패해도 다른 쪽은 살린다"""
+    today = datetime.now().strftime('%Y-%m-%d')
+    out, warns = [], []
+    for name, f in (('정왕', lambda: jw_upcoming(year, today)), ('안양', lambda: alb_upcoming(today))):
+        try: out += f()
+        except Exception as e: warns.append(f'{name} 예정 경기 수집 실패: {e}')
+    out.sort(key=lambda g: (g['date'], g['time']))
+    return out, warns
+
 def alb_box(g, refresh=False):
     url = f"{ALB_HOST}/z/view.php?id=game&no={g['no']}"
     t = cached(f"alb_{g['no']}", url, 'cp949', refresh)
@@ -502,6 +551,10 @@ def main():
     st = season_stats(games)
     bat_all, pit_all = st['all']['batters'], st['all']['pitchers']
     past = load_seasons(a.year)
+    print('[예정 경기] 두 리그 일정...')
+    up, up_warns = upcoming(a.year)
+    for g in up: print('  ', g['date'], g['time'], g['league'], 'vs', g['opp'], g['place'])
+    warns += up_warns
     out = {
         'updated': datetime.now().strftime('%Y-%m-%d %H:%M'),
         'season': a.year,
@@ -519,6 +572,7 @@ def main():
         'past_batters': base.get('past_batters', []),
         # 모바일 대시보드용 확장 필드
         'box': games,
+        'upcoming': up,          # 예정 경기 (오늘 이후, 리그 일정표 기준)
         'stats': st,
         'years': sorted(list(past) + [a.year], reverse=True),     # 지난 시즌 상세는 seasons/YYYY.json
         'history': history({**past, a.year: games}),

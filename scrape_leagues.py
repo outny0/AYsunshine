@@ -304,13 +304,20 @@ def alb_upcoming(today):
                         'comp': '', 'div': '', 'kind': ALB_KIND.get(r[3] if len(r) > 3 else '', ''), 'status': ''})
     return out
 
-def upcoming(year):
-    """두 리그 예정 경기 (날짜·시간순). 한쪽이 실패해도 다른 쪽은 살린다"""
+def upcoming(year, prev=()):
+    """두 리그 예정 경기 (날짜·시간순). 한쪽이 실패하면 그 리그는 지난번 목록(prev)에서 아직 안 지난 경기를 쓴다"""
     today = datetime.now().strftime('%Y-%m-%d')
     out, warns = [], []
-    for name, f in (('정왕', lambda: jw_upcoming(year, today)), ('안양', lambda: alb_upcoming(today))):
+    def alb():
+        if SKIP_ALB: raise OSError('SKIP_ALB=1')
+        return alb_upcoming(today)
+    for name, f in (('정왕', lambda: jw_upcoming(year, today)), ('안양', alb)):
         try: out += f()
-        except Exception as e: warns.append(f'{name} 예정 경기 수집 실패: {e}')
+        except Exception as e:
+            keep = [g for g in prev if g['league'] == name and g['date'] >= today]
+            out += keep
+            if name != '안양' or not SKIP_ALB:
+                warns.append(f'{name} 예정 경기 수집 실패({e}) — 지난 목록 {len(keep)}경기 유지')
     out.sort(key=lambda g: (g['date'], g['time']))
     return out, warns
 
@@ -460,7 +467,11 @@ def legacy_pitcher(p):
 # --- 메인 ---
 SEASON_DIR = os.path.join(SCRIPT_DIR, 'seasons')     # 지난 시즌: seasons/YYYY.json (한 번 받아두면 끝)
 
-def scrape_year(year, refresh=False):
+# 안양 사이트(alb.or.kr)는 해외 접속을 막는다 — GitHub Actions 에서는 SKIP_ALB=1 로 건너뛰고 지난 data.json 의 안양 기록을 그대로 쓴다
+SKIP_ALB = os.environ.get('SKIP_ALB') == '1'
+
+def scrape_year(year, refresh=False, ay_fallback=None):
+    """ay_fallback: 안양 사이트에 못 닿을 때 대신 쓸 지난 안양 경기 목록. None 이면 실패를 그대로 올린다(--archive)"""
     games, warns = [], []
     print(f'[정왕] {year} 경기 목록...')
     for g in jw_game_list(year):
@@ -469,9 +480,18 @@ def scrape_year(year, refresh=False):
         except Exception as e: warns.append(str(e)); print('  ', g['date'], '실패:', e)
 
     print(f'[안양] {year} 경기 목록...')
-    for g in alb_game_list(year):
+    try:
+        if SKIP_ALB: raise OSError('SKIP_ALB=1')
+        alb_list = alb_game_list(year)
+    except OSError as e:
+        if ay_fallback is None: raise
+        print(f'   안양 사이트 접속 안 됨({e}) → 지난 기록 {len(ay_fallback)}경기 그대로 사용')
+        games += ay_fallback
+        alb_list = None
+    for g in alb_list or []:
         try: games.append(alb_box(g, refresh)); print('  ', g['date'], 'OK')
         except Exception as e: warns.append(str(e)); print('  ', g['date'], '실패:', e)
+    if alb_list is None: warns.append('안양 사이트 접속 안 됨 — 안양은 지난 수집분 그대로')
 
     games.sort(key=lambda g: (g['date'], g['time']))
     for g in games:
@@ -482,7 +502,7 @@ def scrape_year(year, refresh=False):
             elif len(b['pas']) < b['pa']:
                 warns.append(f"{g['date']} {g['league']} {b['name']}: 타석 {b['pa']}인데 결과 {len(b['pas'])}개만 기록됨 (리그 원본 누락)")
         if not g['pitch_complete']: warns.append(f"{g['date']} {g['league']} vs {g['opp']}: 투수 기록 미입력(박스스코어로 일부 보정)")
-    return games, warns
+    return games, warns, alb_list is not None
 
 def season_stats(games):
     jw = [g for g in games if g['league'] == '정왕']
@@ -531,7 +551,7 @@ def main():
         y1, y2 = (int(x) for x in a.archive.split('-'))
         os.makedirs(SEASON_DIR, exist_ok=True)
         for y in range(y1, y2 + 1):
-            games, warns = scrape_year(y, a.refresh)
+            games, warns, _ = scrape_year(y, a.refresh)
             if not games: print(f'  {y}: 경기 없음'); continue
             write_json(os.path.join(SEASON_DIR, f'{y}.json'),
                        {'year': y, 'updated': datetime.now().strftime('%Y-%m-%d %H:%M'), 'record': record(games),
@@ -540,23 +560,30 @@ def main():
             print(f"→ {y}: {r['g']}경기 {r['w']}승 {r['l']}패 {r['d']}무, 경고 {len(warns)}건")
         return
 
-    games, warns = scrape_year(a.year, a.refresh)
-    jw = [g for g in games if g['league'] == '정왕']
-    ay = [g for g in games if g['league'] == '안양']
-
     base = {}
     if os.path.exists(BASE_JSON):
         with open(BASE_JSON, encoding='utf-8') as f: base = json.load(f)
+    same_season = base.get('season') == a.year
+    prev_ay = [g for g in base.get('box', []) if g['league'] == '안양'] if same_season else []
+
+    games, warns, ay_ok = scrape_year(a.year, a.refresh, ay_fallback=prev_ay)
+    jw = [g for g in games if g['league'] == '정왕']
+    ay = [g for g in games if g['league'] == '안양']
+    now = datetime.now().strftime('%Y-%m-%d %H:%M')
+    # 안양 기록이 언제 받은 것인지 — 못 받았으면 지난 값을 이어받는다(화면에 「안양 M.D 기준」 표시)
+    ay_updated = now if ay_ok else (base.get('ay_updated') or base.get('updated', ''))
 
     st = season_stats(games)
     bat_all, pit_all = st['all']['batters'], st['all']['pitchers']
     past = load_seasons(a.year)
     print('[예정 경기] 두 리그 일정...')
-    up, up_warns = upcoming(a.year)
+    up, up_warns = upcoming(a.year, prev=base.get('upcoming', []) if same_season else [])
     for g in up: print('  ', g['date'], g['time'], g['league'], 'vs', g['opp'], g['place'])
     warns += up_warns
     out = {
-        'updated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+        'updated': now,
+        'ay_updated': ay_updated,
+        'ay_live': ay_ok,        # 이번 실행에서 안양 사이트를 실제로 받았나 (False = 지난 수집분)
         'season': a.year,
         'source': 'scrape',
         # 기존 index.html 호환 필드

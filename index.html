@@ -259,7 +259,9 @@ function setYear(y) {
 function alertBar(msg) { const m = $app.querySelector('main'); if (m) m.insertAdjacentHTML('afterbegin', `<div class="warn">${esc(msg)}</div>`); }
 const yearSel = () => `<label class="ysel"><span class="sr">시즌 선택</span>
   <select data-act="year">${D.years.map(y => `<option value="${y}"${y === S.year ? ' selected' : ''}>${y}</option>`).join('')}</select></label>`;
+const stamp = s => esc(String(s).slice(5, 10).replace('-', '.'));
 const seasonLabel = () => isCur() ? `${D.season} 시즌 · ${esc(D.updated.slice(5).replace('-', '.'))} 갱신`
+  + (D.ay_updated && D.ay_updated.slice(0, 10) !== D.updated.slice(0, 10) ? ` · 안양 ${stamp(D.ay_updated)} 기준` : '')
   : `<span class="past-tag">지난 시즌</span> ${S.year}`;
 
 // 예정 경기 — data.json upcoming (수집 시점 기준이라, 화면에서 오늘 이전 경기는 한 번 더 거른다)

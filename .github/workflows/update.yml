@@ -27,6 +27,16 @@ jobs:
           key: league-cache-${{ github.run_id }}
           restore-keys: league-cache-
 
+      # alb.or.kr 은 DNS 설정이 깨져 구글·GitHub 기본 DNS 에서 못 찾는다(SERVFAIL). Cloudflare DNS 는 찾으므로
+      # 거기서 받은 주소를 hosts 에 적어 둔다 (2026-10-25)
+      - name: Resolve league hosts
+        run: |
+          for h in www.alb.or.kr alb.or.kr; do
+            ip=$(curl -s -H 'accept: application/dns-json' "https://cloudflare-dns.com/dns-query?name=$h&type=A" | python -c "import sys,json; a=[x['data'] for x in json.load(sys.stdin).get('Answer',[]) if x['type']==1]; print(a[0] if a else '')")
+            echo "$h -> $ip"
+            [ -n "$ip" ] && echo "$ip $h" | sudo tee -a /etc/hosts
+          done
+
       - name: Scrape
         env:
           PYTHONIOENCODING: utf-8

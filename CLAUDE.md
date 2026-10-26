@@ -1,0 +1,46 @@
+# AY션샤인 팀 대시보드
+
+사회인 야구팀 AY션샤인의 모바일 대시보드. 두 리그 사이트 경기기록을 스크래핑해 `data.json`을 만들고, 단일 페이지 `index.html`이 읽어서 보여준다.
+- 사이트: https://outny0.github.io/AYsunshine/ (GitHub Pages, main 브랜치에 push하면 1~2분 뒤 반영)
+- 사용자: 팀 운영자. 한국어로, 짧고 쉽게 설명. 핸드폰(Claude 앱 Code)이나 PC에서 작업함.
+
+## 파일
+| 파일 | 역할 |
+|------|------|
+| `index.html` | 모바일 SPA (vanilla JS, 해시 라우팅 `#/` `#/games` `#/game/<id>` `#/week` `#/lineup/<id>` `#/players` `#/player/<이름>`) |
+| `data.json` | 올 시즌 전체 + `years`·`history`(연도별 팀/선수 기록). **Actions가 자동 커밋하므로 직접 고칠 일 거의 없음** |
+| `seasons/YYYY.json` | 지난 시즌(2019~2025) 박스스코어·집계. 한 번 받아두면 끝 (`--archive`) |
+| `scrape_leagues.py` | 정왕+안양 수집 → `data_scraped.json` |
+| `validate_scrape.py` | 리그 사이트 시즌 누적과 대조, 불일치 시 exit 1 |
+| `.github/workflows/update.yml` | 매주 월 03:00 / 수 21:00 KST 자동 수집→검증→data.json 커밋 (수동: Actions → update-data → Run workflow) |
+| `apps_script/Code.gs` | 출석 투표·라인업 저장소 (Google Apps Script 웹 앱 + 구글 시트). 설치법 `apps_script/설치_안내.md` |
+| `docs/` | 개발기록(스크래퍼 함정 상세), 작업일지 |
+
+## 실행
+```bash
+PYTHONIOENCODING=utf-8 python scrape_leagues.py          # 올해 시즌 (종료 경기는 cache/ 재사용)
+PYTHONIOENCODING=utf-8 python validate_scrape.py         # 검증
+cp data_scraped.json data.json                           # 검증 통과 시에만
+python scrape_leagues.py --archive 2019-2025             # 지난 시즌 다시 받기 (필요할 때만)
+python -m http.server 8765                               # 로컬 확인 → http://localhost:8765/
+```
+- 표준 라이브러리만 사용 (pip 설치 불필요)
+- 리그 서버 배려: 요청 간격 1.5초, 종료 경기는 캐시. 같은 페이지 반복 요청 금지 (shbaseball robots.txt Crawl-delay 86400)
+
+## 데이터 출처와 함정 (상세: docs/AY션샤인_대시보드_개발기록.md "리그 스크래퍼")
+- 정왕 = shbaseball.co.kr (UTF-8, 팀번호 294). 일정 검색·기록지는 **PC URL** 사용 (모바일 POST는 빈 페이지). 검증용 시즌 누적은 모바일 UA로.
+- 안양 = alb.or.kr (cp949). 오래된 SSL → SECLEVEL=1, 깨진 `P3P :` 헤더 때문에 청크 직접 해제(`dechunk`). 리그 시즌 ≠ 달력 연도(`league_season`).
+- 한 칸에 타석 여러 개(`4구 4구`) → 공백·쉼표 분리, 주루 이벤트는 앞 타석에 붙임. `스낫(출)`은 삼진 아님. `=4회콜드` 같은 메모는 타석 아님.
+- 안양은 투수 세부 기록이 빈 경기 있음(`pitch_complete=false`) → ERA 과소. 기권승·몰수승은 `forfeit`.
+- 화면의 연도 = 경기 날짜 기준. 엑셀 시절 FY = 안양 리그 시즌 기준 + 시장기·PO 제외.
+
+## 작업 규칙
+- 변경 후 브라우저로 화면 확인, 콘솔 오류 없는지 확인하고 push
+- 스크래퍼를 고치면 `validate_scrape.py` 통과 확인
+- `push_to_github_sunshine.py`(토큰 들어 있음, 사용자 PC에만 있음)는 저장소에 올리지 않는다. 토큰 얘기는 다시 꺼내지 않는다(사용자 확인 완료).
+- `data_scraped.json`, `cache/`는 커밋하지 않음 (.gitignore)
+- 작업이 끝나면 `docs/작업일지_YYMMDD.md`에 한 일 기록
+
+## 진행 상황 / 남은 일
+- 출석 투표·라인업: 화면 완성. **`index.html`의 `ATTEND_API`가 비어 있음** → 사용자가 Apps Script 웹 앱을 배포해 `…/exec` 주소를 주면 넣고 push. (사무실 PC에서 권한 승인 시 `401 invalid_client` 발생 — 계정 여러 개 로그인/회사 보안 프로그램 의심, 시크릿 창이나 다른 네트워크에서 재시도 안내함)
+- 선택: 다음 경기 일정 자동 수집(안양은 공지글 형태라 어려움), 팀 로고(`팀로고.png`) 적용

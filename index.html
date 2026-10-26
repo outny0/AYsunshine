@@ -93,6 +93,16 @@ main{padding:14px 16px 20px;display:flex;flex-direction:column;gap:14px}
 .form .W{background:var(--accent);color:#fff}.form .L{background:var(--border);color:var(--sub)}.form .D{background:var(--soft);color:var(--sub)}
 .vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center}
 .vs .sc{font-size:36px;font-weight:900}
+.rklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.rklist li{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:7px 4px;border-top:1px solid var(--line);font-size:14px}
+.rklist li:first-child{border-top:none}
+.rklist .rn{font-weight:700;color:var(--muted);text-align:center}
+.rklist .tm{font-size:11px;color:var(--muted);margin-left:2px}
+.rklist li.me{background:var(--bb-bg);border-radius:8px;border-top-color:transparent}
+.rklist li.me .nm,.rklist li.me b,.rklist li.me .rn{color:var(--accent);font-weight:800}
+.rk.in{border:2px solid var(--accent)}
+.badge.mine{background:var(--accent);color:#fff;font-weight:700}
+.gap{color:var(--accent-dk)}
 .note{font-size:12px;color:var(--sub);background:var(--soft);border-radius:10px;padding:10px 12px}
 .btn{height:44px;border-radius:12px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;background:#fff;color:var(--accent)}
 .leaders{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
@@ -229,6 +239,7 @@ nav.tabbar a.on{color:var(--accent);font-weight:700}
 
 <script>
 // AY션샤인 모바일 대시보드 — data.json(scrape_leagues.py 출력)을 읽어 해시 라우팅으로 5개 화면 렌더
+const TEAM = 'AY션샤인';
 const LG = { all: '통합', jw: '정왕', ay: '안양' };
 const LG_NAME = { '정왕': 'jw', '안양': 'ay' };
 let D = null;
@@ -524,7 +535,14 @@ const BAT_COLS = [['g', '경기'], ['avg', '타율'], ['h', '안타'], ['hr', '�
 const BAT_SORT = [['avg', '타율'], ['ops', 'OPS'], ['h', '안타'], ['rbi', '타점'], ['sb', '도루'], ['hr', '홈런']];
 const PIT_COLS = [['g', '경기'], ['era', 'ERA'], ['wl', '승-패'], ['ip', '이닝'], ['so', '삼진'], ['bb', '볼넷'], ['whip', 'WHIP']];
 const PIT_SORT = [['era', 'ERA'], ['ip', '이닝'], ['so', '삼진'], ['w', '승'], ['g', '등판']];
+const pSeg = () => `
+    <div class="seg" role="tablist" aria-label="타자 투수 순위" style="grid-template-columns:repeat(3,1fr)">
+      ${[['bat', '타자'], ['pit', '투수'], ['rank', '리그 순위']].map(([k, l]) =>
+        `<button role="tab" class="${S.pTab === k ? 'on' : ''}" data-act="ptab" data-v="${k}">${l}</button>`).join('')}
+    </div>`;
+
 function viewPlayers() {
+  if (S.pTab === 'rank') return viewRanks();
   const lg = S.pLeague, st = stats(lg), isBat = S.pTab === 'bat';
   const key = isBat ? S.sortBat : S.sortPit;
   const q = qualPA(lg);
@@ -548,10 +566,7 @@ function viewPlayers() {
     <div class="row between"><div style="display:flex;flex-direction:column"><span class="title" style="font-size:20px">선수 기록</span>
       <span class="small" style="color:var(--hm)">${isCur() ? '' : '<span class="past-tag">지난 시즌</span> '}${S.year} · ${LG[lg]}</span></div>
       ${yearSel()}</div>
-    <div class="seg" role="tablist" aria-label="타자 투수">
-      <button role="tab" class="${isBat ? 'on' : ''}" data-act="ptab" data-v="bat">타자</button>
-      <button role="tab" class="${isBat ? '' : 'on'}" data-act="ptab" data-v="pit">투수</button>
-    </div>
+    ${pSeg()}
     <div class="pills" role="tablist" aria-label="리그 필터">
       ${Object.keys(LG).map(k => `<button role="tab" class="pill${k === lg ? ' on' : ''}" data-act="pleague" data-v="${k}">${LG[k]}</button>`).join('')}
     </div>
@@ -569,6 +584,54 @@ function viewPlayers() {
       }).join('')}</tbody></table>
     </section>
     <span class="foot">${isBat ? `비율 기록(타율·OPS)은 ${q}타석 이상 우선, 미달은 흐리게` : 'ERA는 10이닝 이상 우선, 미달은 흐리게 · ERA 7이닝 기준'}${lg !== 'jw' && !isBat ? ' · 안양 일부 경기는 자책·삼진 미입력' : ''}</span>
+  </main>`;
+}
+
+// ---------- 화면: 리그 개인 순위 (data.json awards — 리그 기록실 부문별 상위 5) ----------
+function viewRanks() {
+  const aw = D.awards || {};
+  const fmt = (c, v) => c.key === 'avg' ? avg3(v) : c.key === 'era' ? v.toFixed(2) : String(Math.round(v));
+  const inn = x => { const o = Math.round(x * 3); return Math.floor(o / 3) + ['', '⅓', '⅔'][o % 3]; };
+  const rankTxt = r => r ? `${r}위` : '30위 밖';
+  const card = c => {
+    const fifth = c.top.length ? c.top[c.top.length - 1].v : null, m = c.mine;
+    const inTop = m && m.rank && m.rank <= 5;
+    const shown = inTop && c.top.some(p => p.team === TEAM && p.name === m.name);
+    let foot = '';
+    if (c.short) foot = `<b>규정${c.key === 'era' ? '이닝' : '타석'} 채운 선수 없음</b> · 가장 가까운 ${esc(c.short.name)} ${c.key === 'era' ? inn(c.short.have) + '/' + c.short.need + '이닝' : c.short.have + '/' + c.short.need + '타석'} (${fmt(c, c.short.v)})`;
+    else if (!m) foot = '우리 팀 기록 없음';
+    else if (!inTop) {
+      const gap = c.asc ? m.v - fifth : fifth - m.v;
+      foot = `우리 최고 <b>${esc(m.name)}</b> ${fmt(c, m.v)} · ${rankTxt(m.rank)} · <b class="gap">5위와 ${c.key === 'avg' ? avg3(gap) : c.key === 'era' ? gap.toFixed(2) : Math.round(gap) + '개'} 차이</b>`;
+    } else if (!shown) foot = `<b>${esc(m.name)}</b> ${fmt(c, m.v)} · 공동 ${m.rank}위`;
+    return `<section class="card rk${inTop ? ' in' : ''}" aria-label="${esc(c.label)} 순위">
+      <div class="row between"><span class="h2">${esc(c.label)}${inTop ? ' <span class="badge mine">TOP5</span>' : ''}</span>
+        ${c.qual ? `<span class="tiny muted">${esc(c.qual)}</span>` : ''}</div>
+      <ol class="rklist">${c.top.map(p => `<li class="${p.team === TEAM ? 'me' : ''}"><span class="rn">${p.rank}</span>
+        <span class="nm">${esc(p.name)} <span class="tm">${esc(p.team)}</span></span><b>${fmt(c, p.v)}</b></li>`).join('')}</ol>
+      ${c.more ? `<span class="tiny muted">외 ${c.more}명 공동 ${c.top[c.top.length - 1].rank}위</span>` : ''}
+      ${foot ? `<div class="note">${foot}</div>` : ''}
+    </section>`;
+  };
+  const league = (k, a) => {
+    const tops = a.cats.filter(c => c.mine && c.mine.rank && c.mine.rank <= 5);
+    return `<section class="card"><div class="row between"><span class="h2">${esc(k)} · ${esc(a.div)}</span>
+        <span class="tiny muted">${esc(a.updated.slice(5, 10).replace('-', '.'))} 기준</span></div>
+      <div class="small" style="color:var(--sub)">${tops.length
+        ? '우리 팀 TOP5: ' + tops.map(c => `<b style="color:var(--accent)">${esc(c.label)} ${esc(c.mine.name)} ${c.mine.rank}위</b>`).join(' · ')
+        : '아직 우리 팀 TOP5 부문이 없어요'}</div></section>
+      ${a.cats.map(card).join('')}`;
+  };
+  return `
+  <header>
+    <div class="row between"><div style="display:flex;flex-direction:column"><span class="title" style="font-size:20px">선수 기록</span>
+      <span class="small" style="color:var(--hm)">${D.season} 시즌 · 리그 전체 개인 순위</span></div></div>
+    ${pSeg()}
+  </header>
+  <main style="gap:10px">
+    ${Object.keys(aw).map(k => league(k, aw[k])).join('') || '<div class="empty">아직 순위를 받지 않았어요. 다음 자동 갱신 때 채워집니다.</div>'}
+    ${aw['안양'] ? '' : '<div class="note">안양 리그 순위는 리그 사이트가 해외 서버 접속을 막아 아직 자동으로 못 가져와요.</div>'}
+    <span class="foot">리그 기록실 기준 · 우리 팀은 파란색 · 공동 순위 포함</span>
   </main>`;
 }
 

@@ -504,6 +504,87 @@ def scrape_year(year, refresh=False, ay_fallback=None):
         if not g['pitch_complete']: warns.append(f"{g['date']} {g['league']} vs {g['opp']}: 투수 기록 미입력(박스스코어로 일부 보정)")
     return games, warns, alb_list is not None
 
+# --- 개인 시상 부문 (리그 전체 순위) ---
+# (키, 이름, 타자/투수, 사이트 정렬값, 낮을수록 좋음, 규정 적용, 사이트 열 머리, 우리 기록 키)
+JW_AWARDS = [
+    ('avg', '타율',   'batter',  'AVERAGE',            False, True,  '타율',       'avg'),
+    ('hr',  '홈런',   'batter',  'HOME_RUNS',          False, False, '홈런(G홈런)', 'hr'),
+    ('rbi', '타점',   'batter',  'RUNS_BATTED_IN',     False, False, '타점',       'rbi'),
+    ('h',   '안타',   'batter',  'TOTAL_HITS',         False, False, '안타',       'h'),
+    ('r',   '득점',   'batter',  'RUNS_SCORED',        False, False, '득점',       'r'),
+    ('sb',  '도루',   'batter',  'STOLEN_BASES',       False, False, '도루',       'sb'),
+    ('w',   '다승',   'pitcher', 'WINS',               False, False, '승리',       'w'),
+    ('era', '평균자책', 'pitcher', 'EARNED_RUN_AVERAGE', True,  True,  '평균자책점',  'era'),
+    ('so',  '탈삼진', 'pitcher', 'STRIKE_OUTS',        False, False, '삼진',       'so'),
+]
+
+def ranked(vals):
+    """이미 정렬된 값 목록 → 공동 순위(1,2,2,4)"""
+    out, prev = [], None
+    for i, v in enumerate(vals):
+        if v != prev: rank, prev = i + 1, v
+        out.append(rank)
+    return out
+
+def jw_awards(year, div_games, my):
+    """정왕 우리 부(정왕토요4부 등) 개인 부문별 상위 5명 + 우리 팀 최고 선수.
+    기록실 PC 페이지는 30명씩 나뉘어 있어 부문마다 정렬된 첫 페이지만 받는다(부문당 1회 요청).
+    my: 우리 팀 정왕 시즌 집계 {'batters': […], 'pitchers': […]} — 30위 밖일 때 우리 최고 기록 계산용"""
+    if not div_games: return None
+    comp, div = div_games[-1]['comp'], div_games[-1]['div']
+    url = JW_HOST + '/record/getPlayerRecordList.hs'
+    t = fetch(url, referer=JW_HOST)
+    opt = lambda name: (re.search(r'<option value="(\d+)"[^>]*>\s*' + re.escape(name) + r'\s*</option>', t) or [None, None])[1]
+    top_seq = opt(comp)
+    if not top_seq: raise ValueError(f'정왕 기록실: 리그 {comp} 를 찾지 못함')
+    # 하위 리그 목록은 상위 리그에 따라 바뀜 → 그 상위 리그로 한 번 조회한 페이지에서 찾는다
+    base = {'num': 1, 'action': '/record/getPlayerRecordList.hs', 'playerSeq': '', 'recordType': 'basic',
+            'infoType': 'DEFAULT', 'leagueCategory': 'NORMAL', 'searchYear': year,
+            'searchTopLeagueSeq': top_seq, 'searchKeyword': ''}
+    t = fetch(url, referer=url, data={**base, 'searchLowerLeagueSeq': '', 'playerType': 'batter',
+                                      'orderCondition': 'AVERAGE', 'orderType': 'DESC', 'applyRagulationPlate': 'N'})
+    low_seq = opt(div)
+    if not low_seq: raise ValueError(f'정왕 기록실: {div} 를 찾지 못함')
+    base['searchLowerLeagueSeq'] = low_seq
+    team_g = len(div_games)
+    cats = []
+    for key, label, ptype, order, asc, qual, col, mykey in JW_AWARDS:
+        t = fetch(url, referer=url, data={**base, 'playerType': ptype, 'orderCondition': order,
+                                          'orderType': 'ASC' if asc else 'DESC',
+                                          # 규정 적용: 타자는 Plate, 투수는 Innings (사이트 폼 이름이 다름)
+                                          'applyRagulation' + ('Plate' if ptype == 'batter' else 'Innings'): 'Y' if qual else 'N'})
+        rows = next((rows for tag, rows in tables(t) if rows and rows[0][:2] == ['순위', '선수명']), [])
+        if not rows: raise ValueError(f'정왕 기록실 {label}: 표 없음')
+        ix = next(k for k, h in enumerate(rows[0]) if h.split(' ')[0] == col)
+        per = re.search(r'규정(?:타석|이닝)은\s*([\d.]+)', strip(t))
+        players = []
+        for r in rows[1:]:
+            if len(r) <= ix: continue
+            nm, no = name_no(r[1])
+            players.append({'name': nm, 'team': r[2], 'v': num(r[ix].split()[0])})
+        if not qual: players = [p for p in players if p['v'] > 0]      # 누적 부문에서 0개는 순위에서 뺀다
+        for p, rk in zip(players, ranked([p['v'] for p in players])): p['rank'] = rk
+        top = [p for p in players if p['rank'] <= 5]
+        more = max(0, len(top) - 7); top = top[:7]       # 공동 5위가 너무 많으면(홈런 1개 20명 등) 7명까지만, 나머지는 인원수
+        mine, short = next((p for p in players if p['team'] == TEAM), None), None
+        if not mine:      # 첫 페이지(30명) 밖 — 우리 집계에서 최고 기록 (규정 부문은 규정 충족자만)
+            pool = my['batters' if ptype == 'batter' else 'pitchers']
+            if qual and per:
+                need = float(per.group(1)) * team_g
+                amt = lambda p: p['pa'] if ptype == 'batter' else round(p['outs'] / 3, 1)
+                if pool and not any(amt(p) >= need for p in pool):    # 규정 채운 사람 없음 → 가장 가까운 선수
+                    b = max(pool, key=amt)
+                    short = {'name': b['name'], 'have': amt(b), 'need': need, 'v': b[mykey]}
+                pool = [p for p in pool if amt(p) >= need]
+            pool = [p for p in pool if p.get(mykey) or (key == 'era' and p['outs'])]
+            if pool:
+                b = sorted(pool, key=lambda p: p[mykey] if asc else -p[mykey])[0]
+                mine = {'name': b['name'], 'team': TEAM, 'v': b[mykey], 'rank': None}
+        cats.append({'key': key, 'label': label, 'asc': asc,
+                     'qual': f"규정{'타석' if ptype == 'batter' else '이닝'} 경기당 {per.group(1)}" if qual and per else '',
+                     'top': top, 'more': more, 'mine': mine, 'short': short})
+    return {'comp': comp, 'div': div, 'cats': cats}
+
 def season_stats(games):
     jw = [g for g in games if g['league'] == '정왕']
     ay = [g for g in games if g['league'] == '안양']
@@ -580,6 +661,18 @@ def main():
     up, up_warns = upcoming(a.year, prev=base.get('upcoming', []) if same_season else [])
     for g in up: print('  ', g['date'], g['time'], g['league'], 'vs', g['opp'], g['place'])
     warns += up_warns
+    # 개인 시상 부문 — 우리 정규 리그 부(가장 많이 뛴 리그/부)만. 실패하면 지난 값 유지
+    awards = dict(base.get('awards', {})) if same_season else {}
+    if jw:
+        from collections import Counter
+        cd = Counter((g['comp'], g['div']) for g in jw).most_common(1)[0][0]
+        div_games = [g for g in jw if (g['comp'], g['div']) == cd]
+        print(f'[개인 순위] 정왕 {cd[0]} / {cd[1]}...')
+        try:
+            awards['정왕'] = {**jw_awards(a.year, div_games, {'batters': agg_batters(div_games), 'pitchers': agg_pitchers(div_games)}),
+                             'updated': now}
+        except Exception as e:
+            warns.append(f'정왕 개인 순위 못 받음({e}) — 지난 값 그대로'); print('   실패:', e)
     out = {
         'updated': now,
         'ay_updated': ay_updated,
@@ -600,6 +693,7 @@ def main():
         # 모바일 대시보드용 확장 필드
         'box': games,
         'upcoming': up,          # 예정 경기 (오늘 이후, 리그 일정표 기준)
+        'awards': awards,        # 리그별 개인 부문 상위 5 + 우리 팀 최고 {'정왕': {comp, div, cats, updated}}
         'stats': st,
         'years': sorted(list(past) + [a.year], reverse=True),     # 지난 시즌 상세는 seasons/YYYY.json
         'history': history({**past, a.year: games}),

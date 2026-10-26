@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-26 05:22",
+ "updated": "2026-10-26 22:36",
  "ay_updated": "2026-10-26 03:00",
  "ay_live": false,
  "season": 2026,
@@ -8502,6 +8502,465 @@
    "status": ""
   }
  ],
+ "awards": {
+  "정왕": {
+   "comp": "정왕주말리그",
+   "div": "정왕토요4부",
+   "cats": [
+    {
+     "key": "avg",
+     "label": "타율",
+     "asc": false,
+     "qual": "규정타석 경기당 2.0",
+     "top": [
+      {
+       "name": "정진호",
+       "team": "대원산업",
+       "v": 0.73,
+       "rank": 1
+      },
+      {
+       "name": "박종연",
+       "team": "세븐티즈",
+       "v": 0.692,
+       "rank": 2
+      },
+      {
+       "name": "윤석형",
+       "team": "DOGFIGHT",
+       "v": 0.679,
+       "rank": 3
+      },
+      {
+       "name": "박기동",
+       "team": "AllSutaz",
+       "v": 0.667,
+       "rank": 4
+      },
+      {
+       "name": "최재원",
+       "team": "레전드드래곤",
+       "v": 0.618,
+       "rank": 5
+      }
+     ],
+     "more": 0,
+     "mine": {
+      "name": "민병훈",
+      "team": "AY션샤인",
+      "v": 0.5,
+      "rank": 29
+     },
+     "short": null
+    },
+    {
+     "key": "hr",
+     "label": "홈런",
+     "asc": false,
+     "qual": "",
+     "top": [
+      {
+       "name": "심우창",
+       "team": "Oh브라더스",
+       "v": 2.0,
+       "rank": 1
+      },
+      {
+       "name": "김민식",
+       "team": "터틀즈",
+       "v": 2.0,
+       "rank": 1
+      },
+      {
+       "name": "하현철",
+       "team": "대원산업",
+       "v": 2.0,
+       "rank": 1
+      },
+      {
+       "name": "전성열",
+       "team": "AY션샤인",
+       "v": 2.0,
+       "rank": 1
+      },
+      {
+       "name": "박현수",
+       "team": "엔젤스",
+       "v": 1.0,
+       "rank": 5
+      },
+      {
+       "name": "백승훈",
+       "team": "백만볼트",
+       "v": 1.0,
+       "rank": 5
+      },
+      {
+       "name": "윤석형",
+       "team": "DOGFIGHT",
+       "v": 1.0,
+       "rank": 5
+      }
+     ],
+     "more": 17,
+     "mine": {
+      "name": "전성열",
+      "team": "AY션샤인",
+      "v": 2.0,
+      "rank": 1
+     },
+     "short": null
+    },
+    {
+     "key": "rbi",
+     "label": "타점",
+     "asc": false,
+     "qual": "",
+     "top": [
+      {
+       "name": "전성열",
+       "team": "AY션샤인",
+       "v": 27.0,
+       "rank": 1
+      },
+      {
+       "name": "박종연",
+       "team": "세븐티즈",
+       "v": 23.0,
+       "rank": 2
+      },
+      {
+       "name": "문종대",
+       "team": "시흥 HT",
+       "v": 22.0,
+       "rank": 3
+      },
+      {
+       "name": "이종무",
+       "team": "풀스윙",
+       "v": 22.0,
+       "rank": 3
+      },
+      {
+       "name": "김영종",
+       "team": "AllSutaz",
+       "v": 22.0,
+       "rank": 3
+      },
+      {
+       "name": "박현수",
+       "team": "엔젤스",
+       "v": 22.0,
+       "rank": 3
+      }
+     ],
+     "more": 0,
+     "mine": {
+      "name": "전성열",
+      "team": "AY션샤인",
+      "v": 27.0,
+      "rank": 1
+     },
+     "short": null
+    },
+    {
+     "key": "h",
+     "label": "안타",
+     "asc": false,
+     "qual": "",
+     "top": [
+      {
+       "name": "정진호",
+       "team": "대원산업",
+       "v": 27.0,
+       "rank": 1
+      },
+      {
+       "name": "박종연",
+       "team": "세븐티즈",
+       "v": 27.0,
+       "rank": 1
+      },
+      {
+       "name": "박기동",
+       "team": "AllSutaz",
+       "v": 26.0,
+       "rank": 3
+      },
+      {
+       "name": "김준영",
+       "team": "세븐티즈",
+       "v": 23.0,
+       "rank": 4
+      },
+      {
+       "name": "이종무",
+       "team": "풀스윙",
+       "v": 22.0,
+       "rank": 5
+      }
+     ],
+     "more": 0,
+     "mine": {
+      "name": "전성열",
+      "team": "AY션샤인",
+      "v": 20.0,
+      "rank": 9
+     },
+     "short": null
+    },
+    {
+     "key": "r",
+     "label": "득점",
+     "asc": false,
+     "qual": "",
+     "top": [
+      {
+       "name": "김일훈",
+       "team": "풀스윙",
+       "v": 25.0,
+       "rank": 1
+      },
+      {
+       "name": "배위혁",
+       "team": "DOGFIGHT",
+       "v": 25.0,
+       "rank": 1
+      },
+      {
+       "name": "김홍식",
+       "team": "풀스윙",
+       "v": 25.0,
+       "rank": 1
+      },
+      {
+       "name": "김준영",
+       "team": "세븐티즈",
+       "v": 24.0,
+       "rank": 4
+      },
+      {
+       "name": "김민식",
+       "team": "터틀즈",
+       "v": 23.0,
+       "rank": 5
+      }
+     ],
+     "more": 0,
+     "mine": {
+      "name": "이준석",
+      "team": "AY션샤인",
+      "v": 19.0,
+      "rank": 14
+     },
+     "short": null
+    },
+    {
+     "key": "sb",
+     "label": "도루",
+     "asc": false,
+     "qual": "",
+     "top": [
+      {
+       "name": "김민식",
+       "team": "터틀즈",
+       "v": 31.0,
+       "rank": 1
+      },
+      {
+       "name": "서창순",
+       "team": "누리티앤씨",
+       "v": 27.0,
+       "rank": 2
+      },
+      {
+       "name": "권택민",
+       "team": "Oh브라더스",
+       "v": 22.0,
+       "rank": 3
+      },
+      {
+       "name": "구자원",
+       "team": "누리티앤씨",
+       "v": 19.0,
+       "rank": 4
+      },
+      {
+       "name": "설정우",
+       "team": "시흥 HT",
+       "v": 19.0,
+       "rank": 4
+      },
+      {
+       "name": "정진환",
+       "team": "아우라위너스",
+       "v": 19.0,
+       "rank": 4
+      },
+      {
+       "name": "김태성",
+       "team": "백만볼트",
+       "v": 19.0,
+       "rank": 4
+      }
+     ],
+     "more": 0,
+     "mine": {
+      "name": "전성열",
+      "team": "AY션샤인",
+      "v": 15.0,
+      "rank": 18
+     },
+     "short": null
+    },
+    {
+     "key": "w",
+     "label": "다승",
+     "asc": false,
+     "qual": "",
+     "top": [
+      {
+       "name": "배위혁",
+       "team": "DOGFIGHT",
+       "v": 8.0,
+       "rank": 1
+      },
+      {
+       "name": "황성주",
+       "team": "AllSutaz",
+       "v": 7.0,
+       "rank": 2
+      },
+      {
+       "name": "김성훈",
+       "team": "풀스윙",
+       "v": 7.0,
+       "rank": 2
+      },
+      {
+       "name": "윤홍철",
+       "team": "Oh브라더스",
+       "v": 6.0,
+       "rank": 4
+      },
+      {
+       "name": "이충원",
+       "team": "누리티앤씨",
+       "v": 6.0,
+       "rank": 4
+      }
+     ],
+     "more": 0,
+     "mine": {
+      "name": "이우진",
+      "team": "AY션샤인",
+      "v": 4.0,
+      "rank": 9
+     },
+     "short": null
+    },
+    {
+     "key": "era",
+     "label": "평균자책",
+     "asc": true,
+     "qual": "규정이닝 경기당 2.0",
+     "top": [
+      {
+       "name": "윤홍철",
+       "team": "Oh브라더스",
+       "v": 3.46,
+       "rank": 1
+      },
+      {
+       "name": "이충원",
+       "team": "누리티앤씨",
+       "v": 4.4,
+       "rank": 2
+      },
+      {
+       "name": "배위혁",
+       "team": "DOGFIGHT",
+       "v": 5.57,
+       "rank": 3
+      },
+      {
+       "name": "민갑기",
+       "team": "시흥 HT",
+       "v": 5.63,
+       "rank": 4
+      },
+      {
+       "name": "박민성",
+       "team": "시흥 HT",
+       "v": 5.9,
+       "rank": 5
+      }
+     ],
+     "more": 0,
+     "mine": null,
+     "short": {
+      "name": "이우진",
+      "have": 23.3,
+      "need": 28.0,
+      "v": 7.5
+     }
+    },
+    {
+     "key": "so",
+     "label": "탈삼진",
+     "asc": false,
+     "qual": "",
+     "top": [
+      {
+       "name": "김형준",
+       "team": "아우라위너스",
+       "v": 47.0,
+       "rank": 1
+      },
+      {
+       "name": "배위혁",
+       "team": "DOGFIGHT",
+       "v": 46.0,
+       "rank": 2
+      },
+      {
+       "name": "황성주",
+       "team": "AllSutaz",
+       "v": 41.0,
+       "rank": 3
+      },
+      {
+       "name": "김성훈",
+       "team": "풀스윙",
+       "v": 34.0,
+       "rank": 4
+      },
+      {
+       "name": "정진호",
+       "team": "대원산업",
+       "v": 28.0,
+       "rank": 5
+      },
+      {
+       "name": "김형종",
+       "team": "AY션샤인",
+       "v": 28.0,
+       "rank": 5
+      }
+     ],
+     "more": 0,
+     "mine": {
+      "name": "김형종",
+      "team": "AY션샤인",
+      "v": 28.0,
+      "rank": 5
+     },
+     "short": null
+    }
+   ],
+   "updated": "2026-10-26 22:36"
+  }
+ },
  "stats": {
   "all": {
    "batters": [

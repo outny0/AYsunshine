@@ -7,7 +7,7 @@
 ## 파일
 | 파일 | 역할 |
 |------|------|
-| `index.html` | 모바일 SPA (vanilla JS, 해시 라우팅 `#/` `#/games` `#/game/<id>` `#/week` `#/lineup/<id>` `#/players` `#/player/<이름>`) |
+| `index.html` | 모바일 SPA (vanilla JS, 해시 라우팅 `#/` `#/games` `#/game/<id>` `#/week` `#/lineup/<id>` `#/players` `#/player/<이름>`). 선수 탭 '리그 순위' = `data.json` `awards` |
 | `data.json` | 올 시즌 전체 + `years`·`history`(연도별 팀/선수 기록). **Actions가 자동 커밋하므로 직접 고칠 일 거의 없음** |
 | `seasons/YYYY.json` | 지난 시즌(2019~2025) 박스스코어·집계. 한 번 받아두면 끝 (`--archive`) |
 | `scrape_leagues.py` | 정왕+안양 수집 → `data_scraped.json` |
@@ -34,6 +34,7 @@ python -m http.server 8765                               # 로컬 확인 → htt
 - 안양 = alb.or.kr (cp949). 오래된 SSL → SECLEVEL=1, 깨진 `P3P :` 헤더 때문에 청크 직접 해제(`dechunk`). 리그 시즌 ≠ 달력 연도(`league_season`).
 - 한 칸에 타석 여러 개(`4구 4구`) → 공백·쉼표 분리, 주루 이벤트는 앞 타석에 붙임. `스낫(출)`은 삼진 아님. `=4회콜드` 같은 메모는 타석 아님.
 - 안양은 투수 세부 기록이 빈 경기 있음(`pitch_complete=false`) → ERA 과소. 기권승·몰수승은 `forfeit`.
+- 개인 순위(`awards`): 정왕 PC 기록실 `/record/getPlayerRecordList.hs` POST, 부문마다 정렬된 첫 페이지(30명)만 → 부문당 1회 요청. 규정 적용 파라미터가 타자 `applyRagulationPlate`, 투수 `applyRagulationInnings`로 다름. ERA는 7이닝 기준(우리 집계와 같음). 안양은 해외 접속 차단이라 아직 없음
 - 화면의 연도 = 경기 날짜 기준. 엑셀 시절 FY = 안양 리그 시즌 기준 + 시장기·PO 제외.
 
 ## 작업 규칙

@@ -44,5 +44,6 @@ python -m http.server 8765                               # 로컬 확인 → htt
 - 작업이 끝나면 `docs/작업일지_YYMMDD.md`에 한 일 기록
 
 ## 진행 상황 / 남은 일
-- 출석 투표·라인업: 화면 완성. **`index.html`의 `ATTEND_API`가 비어 있음** → 사용자가 Apps Script 웹 앱을 배포해 `…/exec` 주소를 주면 넣고 push. (사무실 PC에서 권한 승인 시 `401 invalid_client` 발생 — 계정 여러 개 로그인/회사 보안 프로그램 의심, 시크릿 창이나 다른 네트워크에서 재시도 안내함)
-- 선택: 다음 경기 일정 자동 수집(안양은 공지글 형태라 어려움), 팀 로고(`팀로고.png`) 적용
+- 출석 투표·라인업: **연결 완료 (2026-10-26)**. Apps Script 프로젝트 `AY 선샤인 대시보드`(outny0@gmail.com, script.google.com/home), 데이터는 드라이브 시트 `AY션샤인 참석·라인업`. `Code.gs`를 고치면 배포 관리 → 새 버전으로 재배포(URL 유지). 새 프로젝트 직후엔 `401 invalid_client`(OAuth client not fully created) — 10분쯤 기다리면 풀림
+- 팀 로고(`팀로고.png`) 헤더·파비콘 적용 완료
+- 선택: 다음 경기 일정 자동 수집(안양은 공지글 형태라 어려움)

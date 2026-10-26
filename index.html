@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AY션샤인">
 <title>AY션샤인</title>
+<link rel="icon" href="팀로고.png">
+<link rel="apple-touch-icon" href="팀로고.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -45,7 +47,7 @@ main{padding:14px 16px 20px;display:flex;flex-direction:column;gap:14px}
 
 /* 헤더 */
 .brand{display:flex;align-items:center;gap:10px}
-.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}
+.logo{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0}
 .title{font-size:18px;font-weight:700}
 .back{width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;color:var(--ht);border:none;background:none}
 .ltabs{display:grid;grid-template-columns:repeat(3,1fr)}
@@ -342,7 +344,7 @@ function viewHome() {
   return `
   <header>
     <div class="brand">
-      <div class="logo">AY</div>
+      <img class="logo" src="팀로고.png" alt="AY션샤인">
       <div style="flex:1;display:flex;flex-direction:column">
         <span class="title">AY션샤인</span>
         <span class="small" style="color:var(--hm)">${seasonLabel()}</span>
@@ -672,7 +674,7 @@ function viewPlayer(name) {
 }
 
 // ---------- 출석 투표 · 라인업 (저장소: Google Apps Script 웹 앱, apps_script/Code.gs) ----------
-const ATTEND_API = '';            // 배포한 웹 앱 주소 (…/exec)
+const ATTEND_API = 'https://script.google.com/macros/s/AKfycbxnXDOHBb6D67-jqJ7_ncQzO6q8G6GuD8Kn3VrDrl-9KPn6h-UCKbv4sk5895GIqHqY/exec';            // 배포한 웹 앱 주소 (…/exec)
 const VOTES = ['참석', '불참', '미정'];
 const POS = ['P', 'C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'EH'];
 const A = { data: null, err: '', busy: false, weekOff: 0, me: load('me', ''), code: load('code', ''), askCode: false, delArm: '', draft: {}, msg: '' };

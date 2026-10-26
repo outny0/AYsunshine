@@ -1,0 +1,5 @@
+cache/
+__pycache__/
+data_scraped.json
+push_to_github_sunshine.py
+*.xlsx

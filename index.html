@@ -768,6 +768,7 @@ function viewWeek() {
   if (!A.data && !A.err) return head + '<main><div class="empty">불러오는 중…</div></main>';
   const names = roster();
   const games = (A.data?.games || []).slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const sched = schedToOpen(from, to, games);
   return head + `
   <main>
     ${A.err ? `<div class="warn">${esc(A.err)}</div>` : ''}
@@ -784,8 +785,9 @@ function viewWeek() {
         <div class="row" style="margin-top:8px"><input id="anew" class="inp" style="flex:1" maxlength="20" placeholder="이름">
         <button class="btn" style="padding:0 18px" data-act="a-addp">추가</button></div></details>
     </section>
-    ${games.map(g => gameVoteCard(g)).join('') || `<div class="empty">${label} 등록된 경기가 없습니다.<br>아래에서 경기를 등록하면 팀원 모두 투표할 수 있어요.</div>`}
-    ${addGameForm(from, to)}
+    ${sched.map(schedCard).join('')}
+    ${games.map(g => gameVoteCard(g)).join('') || (sched.length ? '' : `<div class="empty">${label} 등록된 경기가 없습니다.<br>아래에서 경기를 등록하면 팀원 모두 투표할 수 있어요.</div>`)}
+    ${addGameForm(from, to, sched.length)}
     <span class="foot">${A.data ? `${esc(A.data.now.slice(11, 16))} 기준 · 30초마다 자동 새로고침` : ''}</span>
   </main>`;
 }
@@ -826,10 +828,32 @@ function gameVoteCard(g) {
   </section>`;
 }
 
-function addGameForm(from, to) {
+// 리그 일정(data.json upcoming) 중 그 주에 있고 아직 투표 경기로 등록 안 된 것 → 한 번 눌러 등록
+function schedToOpen(from, to, games) {
+  return (D.upcoming || []).filter(u => u.date >= from && u.date <= to && u.date >= todayStr()
+    && !games.some(g => g.date === u.date && (g.league === u.league || g.opp === u.opp)));
+}
+function schedCard(u) {
+  const lg = u.league === '정왕' ? 'b-jw' : 'b-ay';
+  return `<section class="card" aria-label="${esc(u.date)} 리그 일정">
+    <div class="row between">
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+        <span style="font-size:16px;font-weight:700">${md(u.date)} (${dowOf(u.date)}) ${esc(u.time || '')}</span>
+        <span class="small" style="color:var(--sub)">vs ${esc(u.opp || '상대 미정')}${u.place ? ' · ' + esc(u.place) : ''}</span>
+      </div>
+      <span class="badge ${lg}">${esc(u.league)}</span>
+    </div>
+    <button class="btn" style="background:var(--accent);color:#fff;border-color:var(--accent)" data-act="a-openg"
+      data-date="${esc(u.date)}" data-time="${esc(u.time || '')}" data-lg="${esc(u.league)}" data-opp="${esc(u.opp || '')}" data-place="${esc(u.place || '')}"
+      ${A.busy ? 'disabled' : ''}>참석 투표 열기</button>
+    <span class="tiny muted">리그 일정에서 가져온 경기예요. 누르면 팀원 모두 투표할 수 있어요</span>
+  </section>`;
+}
+
+function addGameForm(from, to, hasSched) {
   // 기본값: 그 주 토요일 오후
   const sat = new Date(from + 'T00:00:00'); sat.setDate(sat.getDate() + 5);
-  return `<details class="past" ${(A.data?.games || []).length ? '' : 'open'}><summary>+ 경기 등록 <span class="small muted">누구나 가능</span></summary>
+  return `<details class="past" ${(A.data?.games || []).length || hasSched ? '' : 'open'}><summary>+ 경기 등록 <span class="small muted">누구나 가능</span></summary>
     <div class="form2">
       <label>날짜<input id="g-date" type="date" class="inp" value="${ymd(sat)}" min="${from}"></label>
       <label>시간<input id="g-time" type="time" class="inp" value="15:00"></label>
@@ -933,6 +957,13 @@ function aClick(t) {
       aPost({ action: 'addGame', date: val('g-date'), time: val('g-time'), league: val('g-lg'), opp: val('g-opp'),
         place: val('g-place'), memo: val('g-memo'), by: A.me })
         .then(() => { const [f, e] = weekRange(A.weekOff); if (val('g-date') > e || val('g-date') < f) A.err = '다른 주 경기로 등록됐어요. 위 화살표로 그 주로 이동하세요.'; render(); })
+        .catch(e => { A.err = e.message; render(); });
+      return;
+    }
+    case 'a-openg': {
+      if (A.busy) return;
+      const d = t.dataset;
+      aPost({ action: 'addGame', date: d.date, time: d.time, league: d.lg, opp: d.opp, place: d.place, memo: '', by: A.me })
         .catch(e => { A.err = e.message; render(); });
       return;
     }

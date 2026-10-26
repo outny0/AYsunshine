@@ -14,6 +14,7 @@
 | `validate_scrape.py` | 리그 사이트 시즌 누적과 대조, 불일치 시 exit 1 |
 | `.github/workflows/update.yml` | 매주 월 03:00 / 수 21:00 KST 자동 수집→검증→data.json 커밋 (수동: Actions → update-data → Run workflow) |
 | `apps_script/Code.gs` | 출석 투표·라인업 저장소 (Google Apps Script 웹 앱 + 구글 시트). 설치법 `apps_script/설치_안내.md` |
+| `records/` | 전체 기록 보관본: `AY션샤인_전체기록.xlsx`(시트 8개) + 같은 내용 CSV. `export_records.py`로 생성 (엑셀 수기 원본은 삭제함, 이게 대체) |
 | `docs/` | 개발기록(스크래퍼 함정 상세), 작업일지 |
 
 ## 실행
@@ -22,6 +23,7 @@ PYTHONIOENCODING=utf-8 python scrape_leagues.py          # 올해 시즌 (종료
 PYTHONIOENCODING=utf-8 python validate_scrape.py         # 검증
 cp data_scraped.json data.json                           # 검증 통과 시에만
 python scrape_leagues.py --archive 2019-2025             # 지난 시즌 다시 받기 (필요할 때만)
+python export_records.py                                 # records/ 보관본 다시 만들기 (기록 갱신 후 가끔, openpyxl 필요: pip install openpyxl)
 python -m http.server 8765                               # 로컬 확인 → http://localhost:8765/
 ```
 - 표준 라이브러리만 사용 (pip 설치 불필요)
@@ -37,7 +39,7 @@ python -m http.server 8765                               # 로컬 확인 → htt
 ## 작업 규칙
 - 변경 후 브라우저로 화면 확인, 콘솔 오류 없는지 확인하고 push
 - 스크래퍼를 고치면 `validate_scrape.py` 통과 확인
-- `push_to_github_sunshine.py`(토큰 들어 있음, 사용자 PC에만 있음)는 저장소에 올리지 않는다. 토큰 얘기는 다시 꺼내지 않는다(사용자 확인 완료).
+- 작업은 이 저장소에서만 한다 (2026-10-26 사용자 PC·OneDrive 사본은 삭제함, 업로드 스크립트도 없음). 반영은 git push로.
 - `data_scraped.json`, `cache/`는 커밋하지 않음 (.gitignore)
 - 작업이 끝나면 `docs/작업일지_YYMMDD.md`에 한 일 기록
 

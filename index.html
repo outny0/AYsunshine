@@ -185,9 +185,31 @@ table{border-collapse:collapse;width:100%}
 .blab{display:grid;gap:10px;text-align:center;border-top:1px solid var(--border);padding-top:6px;font-size:11px;color:var(--muted)}
 .glog{padding:12px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px;color:var(--text)}
 
+/* 출석 · 라인업 */
+.inp{height:44px;border-radius:10px;border:1px solid var(--out-bd);background:#fff;color:var(--text);font:inherit;font-size:15px;padding:0 10px;min-width:0;width:100%}
+.inp:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.vote{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.vote button{height:48px;border-radius:12px;border:1px solid var(--out-bd);background:#fff;color:var(--sub);font-size:15px;font-weight:700}
+.vote button:disabled{opacity:.5;cursor:default}
+.vote button.on.v-참석{background:var(--accent);border-color:var(--accent);color:#fff}
+.vote button.on.v-불참{background:#57606a;border-color:#57606a;color:#fff}
+.vote button.on.v-미정{background:var(--bb-bg);border-color:var(--bb-bd);color:var(--bb-fg)}
+.tally{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.tally div{background:var(--soft);border-radius:10px;padding:8px 2px;display:flex;flex-direction:column}
+.tally b{font-size:18px}
+.wk{width:38px;height:38px;border-radius:10px;border:1px solid var(--hb);background:var(--hdr2);color:var(--ht);font-size:18px}
+.lnk{border:none;background:none;color:var(--muted);font-size:12px;min-height:36px;padding:0}
+.form2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.form2 label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.form2 .full{grid-column:1/-1}
+.slot{display:grid;grid-template-columns:22px 1fr 92px 36px;gap:6px;align-items:center;padding:5px 12px 5px 14px;border-top:1px solid var(--line)}
+.slot .ord{font-size:13px;font-weight:700;color:var(--muted);text-align:center}
+.slot .x{height:36px;border:none;background:none;color:var(--muted);font-size:14px}
+.sort:disabled,.btn:disabled{opacity:.5;cursor:default}
+
 /* 하단 탭 */
 nav.tabbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border);padding:6px 0 calc(8px + env(safe-area-inset-bottom));z-index:10}
-nav.tabbar .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+nav.tabbar .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
 nav.tabbar a{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:11px}
 nav.tabbar a.on{color:var(--accent);font-weight:700}
 .foot{font-size:11px;color:var(--muted);padding:0 4px}
@@ -199,6 +221,7 @@ nav.tabbar a.on{color:var(--accent);font-weight:700}
 <nav class="tabbar" aria-label="하단 메뉴"><div class="in">
   <a href="#/" data-tab="home"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></svg>홈</a>
   <a href="#/games" data-tab="games"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>경기</a>
+  <a href="#/week" data-tab="week"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>출석</a>
   <a href="#/players" data-tab="players"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>선수</a>
 </div></nav>
 
@@ -648,6 +671,328 @@ function viewPlayer(name) {
   </main>`;
 }
 
+// ---------- 출석 투표 · 라인업 (저장소: Google Apps Script 웹 앱, apps_script/Code.gs) ----------
+const ATTEND_API = '';            // 배포한 웹 앱 주소 (…/exec)
+const VOTES = ['참석', '불참', '미정'];
+const POS = ['P', 'C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'EH'];
+const A = { data: null, err: '', busy: false, weekOff: 0, me: load('me', ''), code: load('code', ''), askCode: false, delArm: '', draft: {}, msg: '' };
+
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+function weekRange(off) {          // 월요일 ~ 일요일
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - (d.getDay() + 6) % 7 + off * 7);
+  const e = new Date(d); e.setDate(d.getDate() + 6);
+  return [ymd(d), ymd(e)];
+}
+const DOW_KO = '일월화수목금토';
+const dowOf = s => DOW_KO[new Date(s + 'T00:00:00').getDay()];
+
+function aFetch() {
+  if (!ATTEND_API) return;
+  const [from, to] = weekRange(A.weekOff);
+  A.busy = true;
+  return fetch(`${ATTEND_API}?from=${from}&to=${to}&t=${Date.now()}`)
+    .then(r => r.json())
+    .then(j => { if (!j.ok) throw new Error(j.error); A.data = j; A.err = ''; })
+    .catch(e => { A.err = '불러오기 실패: ' + e.message; })
+    .finally(() => { A.busy = false; if (/^#\/(week|lineup)/.test(location.hash)) render(); });
+}
+function aPost(body) {
+  const [from, to] = weekRange(A.weekOff);
+  A.busy = true; render();
+  // text/plain 으로 보내야 브라우저 사전 요청(CORS preflight) 없이 Apps Script 로 전달됨
+  return fetch(ATTEND_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ ...body, code: A.code, from, to }) })
+    .then(r => r.json())
+    .then(j => {
+      if (j.error === 'passcode') { A.askCode = true; throw new Error('팀 암호가 필요합니다'); }
+      if (j.error === 'conflict') { A.data = j.state; throw new Error('conflict'); }
+      if (!j.ok) throw new Error(j.error);
+      A.data = j; A.err = ''; return j;
+    })
+    .finally(() => { A.busy = false; render(); });
+}
+
+// 선수 명단: 올 시즌 기록 + 페이지에서 추가한 이름 + 투표한 이름
+function roster() {
+  const s = new Set([...D.stats.all.batters.map(b => b.name), ...D.stats.all.pitchers.map(p => p.name),
+    ...(A.data?.roster || []), ...(A.data?.votes || []).map(v => v.name)]);
+  return [...s].filter(Boolean).sort((a, b) => a.localeCompare(b, 'ko'));
+}
+function mainPos(name) {
+  const c = {};
+  D.box.forEach(g => g.batters.forEach(b => { if (b.name === name && b.pos && b.pos !== 'PH' && b.pos !== 'PR') c[b.pos] = (c[b.pos] || 0) + 1; }));
+  return Object.entries(c).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+}
+function voteMap(gameId) {
+  const m = {};
+  (A.data?.votes || []).filter(v => String(v.gameId) === String(gameId)).forEach(v => m[v.name] = v.status);
+  return m;
+}
+function groups(gameId) {
+  const m = voteMap(gameId), all = roster();
+  const by = st => all.filter(n => m[n] === st);
+  return { yes: by('참석'), no: by('불참'), maybe: by('미정'), none: all.filter(n => !m[n]), m };
+}
+const nameChips = (arr, cls) => arr.length ? `<div class="chips">${arr.map(n => `<span class="chip ${cls || ''}">${esc(n)}</span>`).join('')}</div>` : '<span class="small muted">없음</span>';
+
+function setupNotice() {
+  return `<section class="card"><span class="h2">저장소 연결 전</span>
+    <div class="note">참석 투표·라인업은 구글 시트에 저장됩니다. <b>apps_script/Code.gs</b> 를 Apps Script 웹 앱으로 배포한 뒤
+    그 주소를 index.html 의 <code>ATTEND_API</code> 에 넣으면 켜집니다.</div></section>`;
+}
+function codeBar() {
+  if (!A.askCode) return '';
+  return `<section class="card"><span class="h2">팀 암호</span>
+    <div class="row"><input id="acode" type="password" inputmode="numeric" autocomplete="off" placeholder="팀 암호" value="${esc(A.code)}" class="inp" style="flex:1">
+    <button class="btn" style="padding:0 18px" data-act="a-code">확인</button></div>
+    <span class="tiny muted">한 번 입력하면 이 기기에 기억됩니다</span></section>`;
+}
+
+// ---------- 화면: 이번 주 출석 ----------
+function viewWeek() {
+  const [from, to] = weekRange(A.weekOff);
+  const label = A.weekOff === 0 ? '이번 주' : A.weekOff === 1 ? '다음 주' : A.weekOff === -1 ? '지난 주' : `${md(from)} 주`;
+  const head = `
+  <header>
+    <div class="row between"><div style="display:flex;flex-direction:column"><span class="title" style="font-size:20px">참석 투표</span>
+      <span class="small" style="color:var(--hm)">${label} · ${md(from)}(월) ~ ${md(to)}(일)</span></div>
+      <div class="row" style="gap:4px">
+        <button class="wk" data-act="a-week" data-v="-1" aria-label="이전 주">‹</button>
+        <button class="wk" data-act="a-week" data-v="0" aria-label="이번 주" style="font-size:12px;width:auto;padding:0 10px">이번 주</button>
+        <button class="wk" data-act="a-week" data-v="1" aria-label="다음 주">›</button></div></div>
+  </header>`;
+  if (!ATTEND_API) return head + `<main>${setupNotice()}</main>`;
+  if (!A.data && !A.err) return head + '<main><div class="empty">불러오는 중…</div></main>';
+  const names = roster();
+  const games = (A.data?.games || []).slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  return head + `
+  <main>
+    ${A.err ? `<div class="warn">${esc(A.err)}</div>` : ''}
+    ${codeBar()}
+    <section class="card" aria-label="내 이름">
+      <div class="row between"><span class="h2">내 이름</span><span class="tiny muted">이 기기에 기억됩니다</span></div>
+      <div class="row">
+        <select class="inp" style="flex:1" data-act="a-me" aria-label="내 이름 선택">
+          <option value="">이름을 고르세요</option>
+          ${names.map(n => `<option${n === A.me ? ' selected' : ''}>${esc(n)}</option>`).join('')}
+        </select>
+      </div>
+      <details><summary class="small" style="color:var(--accent);cursor:pointer;min-height:32px;display:flex;align-items:center">명단에 없으면 이름 추가</summary>
+        <div class="row" style="margin-top:8px"><input id="anew" class="inp" style="flex:1" maxlength="20" placeholder="이름">
+        <button class="btn" style="padding:0 18px" data-act="a-addp">추가</button></div></details>
+    </section>
+    ${games.map(g => gameVoteCard(g)).join('') || `<div class="empty">${label} 등록된 경기가 없습니다.<br>아래에서 경기를 등록하면 팀원 모두 투표할 수 있어요.</div>`}
+    ${addGameForm(from, to)}
+    <span class="foot">${A.data ? `${esc(A.data.now.slice(11, 16))} 기준 · 30초마다 자동 새로고침` : ''}</span>
+  </main>`;
+}
+
+function gameVoteCard(g) {
+  const gr = groups(g.id), mine = A.me ? gr.m[A.me] : '';
+  const lu = (A.data.lineups || []).find(l => String(l.gameId) === String(g.id));
+  const lg = g.league === '정왕' ? 'b-jw' : g.league === '안양' ? 'b-ay' : '';
+  return `<section class="card" aria-label="${esc(g.date)} 경기">
+    <div class="row between">
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+        <span style="font-size:16px;font-weight:700">${md(g.date)} (${dowOf(g.date)}) ${esc(g.time)}</span>
+        <span class="small" style="color:var(--sub)">vs ${esc(g.opp || '상대 미정')}${g.place ? ' · ' + esc(g.place) : ''}</span>
+      </div>
+      ${g.league ? `<span class="badge ${lg}" style="${lg ? '' : 'background:var(--soft);color:var(--sub)'}">${esc(g.league)}</span>` : ''}
+    </div>
+    ${g.memo ? `<div class="note">${esc(g.memo)}</div>` : ''}
+    <div class="vote" role="group" aria-label="내 참석 여부">
+      ${VOTES.map(v => `<button class="${mine === v ? 'on v-' + v : ''}" data-act="a-vote" data-g="${esc(g.id)}" data-v="${v}" ${A.me ? '' : 'disabled'} aria-pressed="${mine === v}">${v}</button>`).join('')}
+    </div>
+    ${A.me ? '' : '<span class="tiny muted">위에서 내 이름을 고르면 투표할 수 있어요</span>'}
+    <div class="tally">
+      <div><b style="color:var(--accent)">${gr.yes.length}</b><span class="tiny muted">참석</span></div>
+      <div><b>${gr.no.length}</b><span class="tiny muted">불참</span></div>
+      <div><b>${gr.maybe.length}</b><span class="tiny muted">미정</span></div>
+      <div><b class="muted">${gr.none.length}</b><span class="tiny muted">미응답</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span class="tiny muted">참석</span>${nameChips(gr.yes, 'H')}
+      ${gr.maybe.length ? `<span class="tiny muted">미정</span>${nameChips(gr.maybe, 'BB')}` : ''}
+      ${gr.no.length ? `<span class="tiny muted">불참</span>${nameChips(gr.no)}` : ''}
+    </div>
+    <a class="btn" href="#/lineup/${encodeURIComponent(g.id)}">${lu && lu.lineup.length ? `라인업 보기 · 수정 <span class="tiny muted" style="margin-left:6px">${esc(lu.by || '')} 저장</span>` : '라인업 작성'}</a>
+    <div class="row between">
+      <span class="tiny muted">${g.by ? esc(g.by) + ' 등록' : ''}</span>
+      <button class="lnk" data-act="a-del" data-g="${esc(g.id)}">${A.delArm === String(g.id) ? '정말 삭제할까요? 한 번 더 누르면 삭제' : '경기 삭제'}</button>
+    </div>
+  </section>`;
+}
+
+function addGameForm(from, to) {
+  // 기본값: 그 주 토요일 오후
+  const sat = new Date(from + 'T00:00:00'); sat.setDate(sat.getDate() + 5);
+  return `<details class="past" ${(A.data?.games || []).length ? '' : 'open'}><summary>+ 경기 등록 <span class="small muted">누구나 가능</span></summary>
+    <div class="form2">
+      <label>날짜<input id="g-date" type="date" class="inp" value="${ymd(sat)}" min="${from}"></label>
+      <label>시간<input id="g-time" type="time" class="inp" value="15:00"></label>
+      <label>리그<select id="g-lg" class="inp"><option>정왕</option><option>안양</option><option>친선</option><option>기타</option></select></label>
+      <label>상대 팀<input id="g-opp" class="inp" maxlength="40" placeholder="예: 한양슈퍼스타즈"></label>
+      <label class="full">구장<input id="g-place" class="inp" maxlength="40" placeholder="예: 석수구장"></label>
+      <label class="full">메모<input id="g-memo" class="inp" maxlength="100" placeholder="집합 시간, 준비물 등"></label>
+      <button class="btn full" style="background:var(--accent);color:#fff;border-color:var(--accent)" data-act="a-addg">경기 등록</button>
+    </div></details>`;
+}
+
+// ---------- 화면: 라인업 ----------
+function viewLineup(id) {
+  const back = `<a class="back" href="#/week" aria-label="참석 투표로">${ICON_BACK}</a>`;
+  if (!ATTEND_API) return `<header>${back}</header><main>${setupNotice()}</main>`;
+  const g = (A.data?.games || []).find(x => String(x.id) === String(id));
+  if (!g) return `<header>${back}</header><main>${A.data ? '<div class="empty">경기를 찾을 수 없습니다 (다른 주로 이동했을 수 있어요)</div>' : '<div class="empty">불러오는 중…</div>'}</main>`;
+  const saved = (A.data.lineups || []).find(l => String(l.gameId) === String(id)) || { lineup: [], ver: 0 };
+  let dr = A.draft[id];
+  // 내가 고치는 중이 아니면 항상 저장된 최신 라인업을 보여줌
+  if (!dr || (!dr.dirty && dr.baseVer !== saved.ver)) dr = A.draft[id] = { lineup: saved.lineup.map(x => ({ ...x })), baseVer: saved.ver, dirty: false };
+  while (dr.lineup.length < 9) dr.lineup.push({ name: '', pos: '' });
+  const gr = groups(id);
+  const used = dr.lineup.map(x => x.name).filter(Boolean);
+  const dupN = used.filter((n, i) => used.indexOf(n) !== i);
+  const ps = dr.lineup.map(x => x.pos).filter(p => p && p !== 'DH' && p !== 'EH');
+  const dupP = ps.filter((p, i) => ps.indexOf(p) !== i);
+  const bench = gr.yes.filter(n => !used.includes(n));
+  const standby = [...gr.maybe, ...gr.none].filter(n => !used.includes(n));
+  const opt = (sel, list) => list.map(n => `<option${n === sel ? ' selected' : ''}>${esc(n)}</option>`).join('');
+  const others = roster().filter(n => !gr.yes.includes(n));
+  return `
+  <header style="padding-top:calc(8px + env(safe-area-inset-top))">
+    <div class="row" style="gap:4px">${back}
+      <div style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:700">라인업 · ${md(g.date)} (${dowOf(g.date)}) ${esc(g.time)}</span>
+        <span class="small" style="color:var(--hm)">vs ${esc(g.opp || '상대 미정')}${g.league ? ' · ' + esc(g.league) : ''}</span></div></div>
+  </header>
+  <main>
+    ${A.err ? `<div class="warn">${esc(A.err)}</div>` : ''}
+    ${A.msg ? `<div class="note">${esc(A.msg)}</div>` : ''}
+    ${codeBar()}
+    <section class="card flush" aria-label="선발 라인업">
+      <div class="row between" style="padding:14px 16px 8px"><span class="h2">선발 라인업</span>
+        <span class="tiny muted">${saved.ver ? `${esc(saved.by || '')} · ${esc(String(saved.ts).slice(5, 16).replace('T', ' '))} 저장` : '아직 저장 안 됨'}</span></div>
+      ${dr.lineup.map((x, i) => `<div class="slot">
+        <span class="ord">${i + 1}</span>
+        <select class="inp" data-act="a-slot" data-i="${i}" data-k="name" aria-label="${i + 1}번 타자">
+          <option value="">—</option>
+          <optgroup label="참석 ${gr.yes.length}명">${opt(x.name, gr.yes)}</optgroup>
+          <optgroup label="그 외 (대기·불참)">${opt(x.name, others)}</optgroup>
+        </select>
+        <select class="inp pos" data-act="a-slot" data-i="${i}" data-k="pos" aria-label="${i + 1}번 포지션">
+          <option value="">포지션</option>${POS.map(p => `<option${p === x.pos ? ' selected' : ''}>${p}</option>`).join('')}
+        </select>
+        <button class="x" data-act="a-rm" data-i="${i}" aria-label="${i + 1}번 비우기">✕</button>
+      </div>`).join('')}
+      <div class="row" style="padding:12px 16px;gap:8px;flex-wrap:wrap">
+        <button class="sort" data-act="a-fill">참석자로 빈칸 채우기</button>
+        <button class="sort" data-act="a-more" ${dr.lineup.length >= 15 ? 'disabled' : ''}>+ 타순 추가</button>
+        <button class="sort" data-act="a-reset" ${dr.dirty ? '' : 'disabled'}>되돌리기</button>
+      </div>
+    </section>
+    ${dupN.length ? `<div class="warn">같은 선수가 두 번 들어갔어요: ${esc([...new Set(dupN)].join(', '))}</div>` : ''}
+    ${dupP.length ? `<div class="warn">포지션이 겹쳐요: ${esc([...new Set(dupP)].join(', '))}</div>` : ''}
+    <button class="btn" style="background:var(--accent);color:#fff;border-color:var(--accent);height:50px;font-size:15px;font-weight:700" data-act="a-save" ${dr.dirty && !A.busy ? '' : 'disabled'}>
+      ${A.busy ? '저장 중…' : dr.dirty ? '라인업 저장 (팀 전체에 보임)' : '저장된 상태'}</button>
+    <section class="card" aria-label="대기선수">
+      <div class="row between"><span class="h2">대기선수</span><span class="tiny muted">라인업에 없는 인원</span></div>
+      <span class="tiny muted">참석 · 라인업 외 ${bench.length}명</span>${nameChips(bench, 'H')}
+      <span class="tiny muted">미참석(미정·미응답) ${standby.length}명</span>${nameChips(standby, 'BB')}
+      ${gr.no.length ? `<span class="tiny muted">불참 ${gr.no.length}명</span>${nameChips(gr.no)}` : ''}
+    </section>
+    <span class="foot">누구나 고칠 수 있어요. 다른 사람이 먼저 저장했으면 덮어쓰지 않고 최신 라인업을 다시 보여줍니다.</span>
+  </main>`;
+}
+
+function aClick(t) {
+  const act = t.dataset.act, v = t.dataset.v;
+  const id = (location.hash.match(/^#\/lineup\/(.+)/) || [])[1];
+  const dr = id ? A.draft[decodeURIComponent(id)] : null;
+  A.msg = '';
+  switch (act) {
+    case 'a-week': A.weekOff = v === '0' ? 0 : A.weekOff + +v; A.data = null; A.delArm = ''; render(); aFetch(); return;
+    case 'a-vote': {
+      if (!A.me) return;
+      const cur = voteMap(t.dataset.g)[A.me];
+      const status = cur === v ? '' : v;           // 같은 버튼 다시 누르면 취소
+      aPost({ action: 'vote', gameId: t.dataset.g, name: A.me, status }).catch(e => { A.err = e.message; render(); });
+      return;
+    }
+    case 'a-addp': {
+      const n = document.getElementById('anew').value.trim();
+      if (!n) return;
+      A.me = n; save('me', n);
+      aPost({ action: 'addPlayer', name: n }).catch(e => { A.err = e.message; render(); });
+      return;
+    }
+    case 'a-addg': {
+      const val = k => document.getElementById(k).value.trim();
+      if (!val('g-date')) return;
+      aPost({ action: 'addGame', date: val('g-date'), time: val('g-time'), league: val('g-lg'), opp: val('g-opp'),
+        place: val('g-place'), memo: val('g-memo'), by: A.me })
+        .then(() => { const [f, e] = weekRange(A.weekOff); if (val('g-date') > e || val('g-date') < f) A.err = '다른 주 경기로 등록됐어요. 위 화살표로 그 주로 이동하세요.'; render(); })
+        .catch(e => { A.err = e.message; render(); });
+      return;
+    }
+    case 'a-del':
+      if (A.delArm !== t.dataset.g) { A.delArm = t.dataset.g; render(); return; }
+      A.delArm = '';
+      aPost({ action: 'deleteGame', gameId: t.dataset.g }).catch(e => { A.err = e.message; render(); });
+      return;
+    case 'a-code':
+      A.code = document.getElementById('acode').value.trim(); save('code', A.code); A.askCode = false; A.err = ''; render(); return;
+    case 'a-rm': dr.lineup[+t.dataset.i] = { name: '', pos: '' }; dr.dirty = true; break;
+    case 'a-more': dr.lineup.push({ name: '', pos: '' }); dr.dirty = true; break;
+    case 'a-reset': delete A.draft[decodeURIComponent(id)]; break;
+    case 'a-fill': {
+      const gr = groups(decodeURIComponent(id));
+      const left = gr.yes.filter(n => !dr.lineup.some(x => x.name === n));
+      const taken = new Set(dr.lineup.map(x => x.pos).filter(Boolean));
+      dr.lineup.forEach(x => {
+        if (x.name || !left.length) return;
+        x.name = left.shift();
+        const p = mainPos(x.name);
+        x.pos = p && (!taken.has(p) || p === 'DH') ? p : '';
+        if (x.pos) taken.add(x.pos);
+      });
+      dr.dirty = true; break;
+    }
+    case 'a-save': {
+      const gid = decodeURIComponent(id);
+      const lineup = dr.lineup.filter(x => x.name || x.pos);
+      aPost({ action: 'saveLineup', gameId: gid, lineup, by: A.me, baseVer: dr.baseVer })
+        .then(() => { delete A.draft[gid]; A.msg = '저장했어요. 팀원 모두 같은 라인업을 봅니다.'; render(); })
+        .catch(e => {
+          if (e.message === 'conflict') { delete A.draft[gid]; A.err = '그 사이 다른 사람이 라인업을 저장했어요. 최신 라인업을 불러왔으니 확인 후 다시 고쳐 주세요.'; }
+          else A.err = e.message;
+          render();
+        });
+      return;
+    }
+    default: return;
+  }
+  render();
+}
+function aChange(t) {
+  if (t.dataset.act === 'a-me') { A.me = t.value; save('me', t.value); render(); return true; }
+  if (t.dataset.act === 'a-slot') {
+    const id = decodeURIComponent((location.hash.match(/^#\/lineup\/(.+)/) || [])[1] || '');
+    const dr = A.draft[id];
+    dr.lineup[+t.dataset.i][t.dataset.k] = t.value;
+    if (t.dataset.k === 'name' && t.value && !dr.lineup[+t.dataset.i].pos) dr.lineup[+t.dataset.i].pos = mainPos(t.value);
+    dr.dirty = true; render(); return true;
+  }
+  return false;
+}
+// 출석 화면을 보고 있는 동안 30초마다 새로고침 (라인업을 고치는 중엔 화면을 다시 그리지 않음)
+setInterval(() => {
+  if (document.hidden || !/^#\/(week|lineup)/.test(location.hash) || A.busy) return;
+  if (Object.values(A.draft).some(d => d.dirty)) return;
+  const f = document.activeElement;                       // 입력 중이면 건너뜀
+  if (f && $app.contains(f) && /INPUT|SELECT|TEXTAREA/.test(f.tagName)) return;
+  aFetch();
+}, 30000);
+
 // ---------- 라우팅 ----------
 function render() {
   if (!D) return;
@@ -664,6 +1009,8 @@ function render() {
     }
     html = viewGame(arg); tab = 'games';
   }
+  else if (page === 'week') { html = viewWeek(); tab = 'week'; if (!A.data && !A.busy && !A.err) aFetch(); }
+  else if (page === 'lineup') { html = viewLineup(arg); tab = 'week'; if (!A.data && !A.busy && !A.err) aFetch(); }
   else if (page === 'players') { html = viewPlayers(); tab = 'players'; }
   else if (page === 'player') { html = viewPlayer(arg); tab = 'players'; }
   else { html = viewHome(); tab = 'home'; }
@@ -678,6 +1025,7 @@ $app.addEventListener('click', e => {
   if (!t) return;
   const v = t.dataset.v;
   if (t.dataset.act === 'year') { if (v) setYear(v); return; }   // 드롭다운(select)은 change 에서 처리
+  if (t.dataset.act.startsWith('a-')) { if (t.tagName === 'BUTTON') aClick(t); return; }
   switch (t.dataset.act) {
     case 'league': S.league = v; save('lg', v); break;
     case 'gfilter': S.gFilter = v; break;
@@ -689,7 +1037,7 @@ $app.addEventListener('click', e => {
   render();
 });
 
-$app.addEventListener('change', e => { if (e.target.dataset.act === 'year') setYear(e.target.value); });
+$app.addEventListener('change', e => { if (e.target.dataset.act === 'year') setYear(e.target.value); else aChange(e.target); });
 
 fetch('data.json?t=' + Date.now())
   .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })

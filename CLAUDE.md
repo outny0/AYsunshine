@@ -13,6 +13,7 @@
 | `scrape_leagues.py` | 정왕+안양 수집 → `data_scraped.json` |
 | `validate_scrape.py` | 리그 사이트 시즌 누적과 대조, 불일치 시 exit 1 |
 | `.github/workflows/update.yml` | 매주 월 03:00 / 수 21:00 KST 자동 수집→검증→data.json 커밋 (수동: Actions → update-data → Run workflow) |
+| `laptop_update.ps1` | 노트북 예약 작업 `AY션샤인_안양갱신`(월 07:00 / 수 22:00, 놓치면 켜진 뒤): pull → 안양 포함 수집 → 검증 → data.json 커밋·push. 로그 `%LOCALAPPDATA%\AYsunshine\logs\` |
 | `apps_script/Code.gs` | 출석 투표·라인업 저장소 (Google Apps Script 웹 앱 + 구글 시트). 설치법 `apps_script/설치_안내.md` |
 | `records/` | 전체 기록 보관본: `AY션샤인_전체기록.xlsx`(시트 8개) + 같은 내용 CSV. `export_records.py`로 생성 (엑셀 수기 원본은 삭제함, 이게 대체) |
 | `docs/` | 개발기록(스크래퍼 함정 상세), 작업일지 |
@@ -34,7 +35,7 @@ python -m http.server 8765                               # 로컬 확인 → htt
 - 안양 = alb.or.kr (cp949). 오래된 SSL → SECLEVEL=1, 깨진 `P3P :` 헤더 때문에 청크 직접 해제(`dechunk`). 리그 시즌 ≠ 달력 연도(`league_season`).
 - 한 칸에 타석 여러 개(`4구 4구`) → 공백·쉼표 분리, 주루 이벤트는 앞 타석에 붙임. `스낫(출)`은 삼진 아님. `=4회콜드` 같은 메모는 타석 아님.
 - 안양은 투수 세부 기록이 빈 경기 있음(`pitch_complete=false`) → ERA 과소. 기권승·몰수승은 `forfeit`.
-- 개인 순위(`awards`): 정왕 PC 기록실 `/record/getPlayerRecordList.hs` POST, 부문마다 정렬된 첫 페이지(30명)만 → 부문당 1회 요청. 규정 적용 파라미터가 타자 `applyRagulationPlate`, 투수 `applyRagulationInnings`로 다름. ERA는 7이닝 기준(우리 집계와 같음). 안양은 해외 접속 차단이라 아직 없음
+- 개인 순위(`awards`): 정왕 PC 기록실 `/record/getPlayerRecordList.hs` POST, 부문마다 정렬된 첫 페이지(30명)만 → 부문당 1회 요청. 규정 적용 파라미터가 타자 `applyRagulationPlate`, 투수 `applyRagulationInnings`로 다름. ERA는 7이닝 기준(우리 집계와 같음). 안양은 해외 접속 차단이라 아직 없음 (노트북에서는 접속됨, 2026-10-31)
 - 화면의 연도 = 경기 날짜 기준. 엑셀 시절 FY = 안양 리그 시즌 기준 + 시장기·PO 제외.
 
 ## 작업 규칙

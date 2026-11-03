@@ -84,9 +84,21 @@ def main():
         # 안양 사이트에 못 닿아(해외 서버 등) 지난 수집분을 그대로 쓴 경우 — 이미 검증 거친 값이라 대조 생략
         print(f"\n=== 안양: 이번엔 못 받음 — {d.get('ay_updated')} 수집분 그대로, 대조 생략 ===")
     else:
+        keys = ('g', 'pa', 'ab', 'h', 'd2', 'd3', 'hr', 'rbi', 'r', 'bb', 'hbp', 'so')
+        site = alb_site(year)
         mine = {b['name']: b for b in S.agg_batters(ay)}
-        bad += diff_table(f'안양 타자: 연합회장기 경기별 합산 vs 사이트 시즌 누적 ({len(ay)}경기)', mine, alb_site(year),
-                          ('g', 'pa', 'ab', 'h', 'd2', 'd3', 'hr', 'rbi', 'r', 'bb', 'hbp', 'so'))
+        nb = diff_table(f'안양 타자: 연합회장기 경기별 합산 vs 사이트 시즌 누적 ({len(ay)}경기)', mine, site, keys)
+        # 안양 사이트는 출전 경기 수(PG)는 바로 올리고 타석·안타 등은 며칠 늦게 누적하기도 함(2026-10-31 경기).
+        # 마지막 경기 날짜를 빼고 합산한 값이 사이트와 전부 맞으면 '사이트 누적 지연'으로 보고 통과
+        last = max((g['date'] for g in ay), default='')
+        if nb and last:
+            prev = {b['name']: b for b in S.agg_batters([g for g in ay if g['date'] != last])}
+            # 출전 수는 전체 기준. 마지막 경기에만 나온 선수가 사이트에 아직 없는 것도 지연으로 본다
+            prev = {nm: {**prev.get(nm, {}), 'g': mine[nm]['g']} for nm in mine if nm in prev or nm in site}
+            if not diff_table(f'  ↳ {last} 경기 빼고 다시 대조 (사이트 누적 지연 확인)', prev, site, keys):
+                print(f'  → 사이트 누적에 {last} 경기 기록만 아직 안 들어감 — 지연으로 보고 통과')
+                nb = 0
+        bad += nb
 
     # --- 기존 엑셀과 경기 결과 비교 (data.json 은 업데이트 후 스크랩 결과로 바뀌므로 엑셀 시절 백업 사용) ---
     ref = 'data_엑셀백업.json' if os.path.exists(os.path.join(SCRIPT_DIR, 'data_엑셀백업.json')) else 'data.json'
